@@ -3,11 +3,13 @@
 import pandas as pd
 
 
-class ResultsParamsArray(path):
-    path = path
-    id = 0
-    struct = []
-    data = []
+class ParamsArray(object):
+
+    def __init__(self, path):
+        self.path = path
+        self.id = 0
+        self.struct = []
+        self.data = []
 
     def parse_headers(self):
         fid = open(self.path, "r")
