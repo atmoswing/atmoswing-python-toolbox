@@ -9,6 +9,7 @@ class ParamsArray(object):
     def __init__(self, path):
         self.path = path
         self.id = 0
+        self.score = ''
         self.struct = []
         self.data = []
 
@@ -22,50 +23,52 @@ class ParamsArray(object):
         cols = []
         step = 0
         ptor = 0
-        for idx, row in enumerate(line):
+        for idx, chars in enumerate(line):
             append = False
-            if row[0:10] == '|||| Step(':
-                step = int(row[10:-1])
+            if chars[0:10] == '|||| Step(':
+                step = int(chars[10:-1])
                 self.struct.append(0)
-            if row[0:8] == '|| Ptor(':
-                ptor = int(row[8:-1])
+            elif chars[0:8] == '|| Ptor(':
+                ptor = int(chars[8:-1])
                 self.struct[step] = ptor + 1
-            if row == 'Anb':
+            elif chars == 'Anb':
                 label = 'Anb_{}'.format(step)
                 headers.append(label)
                 cols.append(idx + 1)
-            if row == 'Level':
+            elif chars == 'Level':
                 append = True
                 label = 'Variable_{}_{}'.format(step, ptor)
                 headers.append(label)
                 cols.append(idx-1)
-            if row == 'Time':
+            elif chars == 'Time':
                 append = True
-            if row == 'xMin':
+            elif chars == 'xMin':
                 append = True
-            if row == 'xPtsNb':
+            elif chars == 'xPtsNb':
                 append = True
-            if row == 'xStep':
+            elif chars == 'xStep':
                 append = True
-            if row == 'yMin':
+            elif chars == 'yMin':
                 append = True
-            if row == 'yPtsNb':
+            elif chars == 'yPtsNb':
                 append = True
-            if row == 'yStep':
+            elif chars == 'yStep':
                 append = True
-            if row == 'Weight':
+            elif chars == 'Weight':
                 append = True
-            if row == 'Criteria':
+            elif chars == 'Criteria':
                 append = True
-            if row == 'Calib':
-                headers.append(row)
+            elif chars == 'Calib':
+                headers.append(chars)
                 cols.append(idx + 1)
-            if row == 'Valid':
-                headers.append(row)
+            elif chars == 'Valid':
+                headers.append(chars)
                 cols.append(idx + 1)
+            elif "Score" in chars:
+                self.score = line[idx + 1]
 
             if append:
-                label = '{}_{}_{}'.format(row, step, ptor)
+                label = '{}_{}_{}'.format(chars, step, ptor)
                 headers.append(label)
                 cols.append(idx + 1)
 
@@ -76,6 +79,12 @@ class ParamsArray(object):
     def load(self):
         file_struct = self.parse_headers()
         self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
+        self.remove_failed()
+
+    def remove_failed(self):
+        if self.score == 'CRPS':
+            # Remove 0s
+            self.data.drop(self.data[self.data.Calib == 0].index, inplace=True)
 
     def get_anbs(self, step):
         return self.data['Anb_{}'.format(step)]
@@ -84,7 +93,7 @@ class ParamsArray(object):
         return self.data['Variable_{}_{}'.format(step, ptor)]
 
     def get_variable(self, step, ptor, index=0):
-        var = self.data['Variable_{}_{}'.format(step, ptor)][index]
+        var = self.data['Variable_{}_{}'.format(step, ptor)].iloc[index]
         if 'hgt' in var:
             var = 'Z'
         elif 'tcw' in var:
@@ -101,13 +110,13 @@ class ParamsArray(object):
         return self.data['Level_{}_{}'.format(step, ptor)]
 
     def get_level(self, step, ptor, index=0):
-        return self.data['Level_{}_{}'.format(step, ptor)][index]
+        return self.data['Level_{}_{}'.format(step, ptor)].iloc[index]
 
     def get_times(self, step, ptor):
         return self.data['Time_{}_{}'.format(step, ptor)]
 
     def get_time(self, step, ptor, index=0):
-        return self.data['Time_{}_{}'.format(step, ptor)][index]
+        return self.data['Time_{}_{}'.format(step, ptor)].iloc[index]
 
     def get_xmins(self, step, ptor):
         return self.data['xMin_{}_{}'.format(step, ptor)]
@@ -138,5 +147,11 @@ class ParamsArray(object):
     def get_calib_scores(self):
         return self.data['Calib']
 
+    def get_calib_score(self, index=0):
+        return self.data['Calib'].iloc[index]
+
     def get_valid_scores(self):
         return self.data['Valid']
+
+    def get_valid_score(self, index=0):
+        return self.data['Valid'].iloc[index]
