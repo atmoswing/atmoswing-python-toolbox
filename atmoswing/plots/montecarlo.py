@@ -16,6 +16,7 @@ class PlotsParamsSensitivity(object):
         self.other_results = []
         self.other_results_score = []
         self.other_results_markers = []
+        self.other_results_colors = []
         self.output_path = output_path
         self.do_print = False
         self.step = 0
@@ -32,7 +33,7 @@ class PlotsParamsSensitivity(object):
         plt.ioff()
         self.loop_structure()
 
-    def add_param(self, file, marker='+', period='valid'):
+    def add_param(self, file, marker='+', period='valid', color=''):
         other_result = params.ParamsArray(file)
         other_result.load()
 
@@ -48,14 +49,20 @@ class PlotsParamsSensitivity(object):
                 raise Exception('The number of predictors is different between files ({} vs {}).'
                                 .format(step, other_result.struct[i_step]))
         # Store data
-        self.other_results.append(other_result)
-        self.other_results_markers.append(marker)
         if (period == 'valid') or (period == 'validation'):
             self.other_results_score.append(other_result.get_valid_score())
+            if color == '':
+                color = 'blue'
         elif (period == 'calib') or (period == 'calibration'):
             self.other_results_score.append(other_result.get_calib_score())
+            if color == '':
+                color = 'green'
         else:
             raise Exception('The provided period {} is not recognized.'.format(period))
+
+        self.other_results.append(other_result)
+        self.other_results_markers.append(marker)
+        self.other_results_colors.append(color)
 
     def loop_structure(self):
         for self.step, step in enumerate(self.results.struct):
@@ -109,7 +116,8 @@ class PlotsParamsSensitivity(object):
             other_score = self.other_results_score[idx]
             score = score.append(pd.Series(other_score))
             marker = self.other_results_markers[idx]
-            plt.plot(other_value, other_score, marker=marker)
+            color = self.other_results_colors[idx]
+            plt.plot(other_value, other_score, marker=marker, color=color)
 
         # Formatting
         xmargin = 0.02 * (values.max() - values.min())
