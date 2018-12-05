@@ -56,7 +56,7 @@ class PlotsParamsSensitivity(object):
         elif (period == 'calib') or (period == 'calibration'):
             self.other_results_score.append(other_result.get_calib_score())
             if color == '':
-                color = 'green'
+                color = 'red'
         else:
             raise Exception('The provided period {} is not recognized.'.format(period))
 
