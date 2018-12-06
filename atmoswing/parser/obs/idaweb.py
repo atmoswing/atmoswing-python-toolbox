@@ -7,7 +7,7 @@ import numpy as np
 class Idaweb(object):
     """Extract Idaweb (MeteoSwiss) time series"""
 
-    def __init__(self, file_path='', header_lines = 3):
+    def __init__(self, file_path='', header_lines=3):
         self.file_path = file_path
         self.header_lines = header_lines
 
@@ -32,11 +32,11 @@ class Idaweb(object):
                     m = int(float(date_str[4:6]))
                     d = int(float(date_str[6:8]))
                     if words_line[2] == '-':
-                        p = np.NaN
+                        val = np.NaN
                     else:
-                        p = float(words_line[2])
+                        val = float(words_line[2])
 
-                    line = [y, m, d, p]
+                    line = [y, m, d, val]
                     matrix.append(line)
 
         np_matrix = np.array(matrix)

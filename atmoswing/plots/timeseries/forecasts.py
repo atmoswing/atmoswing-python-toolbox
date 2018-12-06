@@ -14,7 +14,6 @@ class TimeSeriesForecast(object):
         self.fig = None
         self.ax = None
         self.output_path = output_path
-        self.do_print = False
         self.dates = None
         self.obs_values = None
         self.analogs_values = None
@@ -22,21 +21,22 @@ class TimeSeriesForecast(object):
         self.end = 0
         self.ref_periods = []
         self.ref_precip = []
-        self.show_legend = True
-        self.show_dots = False
+        self.__do_print = False
+        self.__show_legend = True
+        self.__show_dots = False
 
     def show(self):
         plt.ion()
-        self.make_figure()
+        self.__make_figure()
 
     def print(self):
         if not self.output_path:
             raise Exception('Output path not provided')
-        self.do_print = True
+        self.__do_print = True
         plt.ioff()
-        self.make_figure()
+        self.__make_figure()
 
-    def make_figure(self):
+    def __make_figure(self):
         self.fig = plt.figure(figsize=(18, 4.5))
         self.ax = self.fig.add_subplot(111)
         self.build()
@@ -51,10 +51,10 @@ class TimeSeriesForecast(object):
         self.ref_precip = ref_precip
 
     def hide_legend(self):
-        self.show_legend = False
+        self.__show_legend = False
 
     def show_all_dots(self):
-        self.show_dots = True
+        self.__show_dots = True
 
     def set_data(self, dates, obs_values, analogs_values):
         self.dates = dates
@@ -92,7 +92,7 @@ class TimeSeriesForecast(object):
         self.ax.plot(plotdates, q100, 'x', markersize=3, color='0.5', label="maximum")
 
         # Plot the dots
-        if self.show_dots:
+        if self.__show_dots:
             for i in range(self.analogs_values.shape[0]):
                 self.ax.plot(plotdates, self.analogs_values[:, i], 'ko')
 
@@ -142,6 +142,6 @@ class TimeSeriesForecast(object):
             plt.xlim(plotdates[0], plotdates[-1])
 
         # Legends
-        if self.show_legend:
+        if self.__show_legend:
             handles, labels = self.ax.get_legend_handles_labels()
             self.ax.legend(handles, labels, loc='upper left', prop=fontmanager.FontProperties(size="smaller"))

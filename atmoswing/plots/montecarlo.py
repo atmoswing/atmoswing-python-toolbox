@@ -3,7 +3,7 @@
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
-from atmoswing.outputs.optimizer import params
+from atmoswing.parser.optimizer import params
 
 
 class PlotsParamsSensitivity(object):
@@ -18,20 +18,20 @@ class PlotsParamsSensitivity(object):
         self.other_results_markers = []
         self.other_results_colors = []
         self.output_path = output_path
-        self.do_print = False
-        self.step = 0
-        self.ptor = 0
+        self.__do_print = False
+        self.__step = 0
+        self.__ptor = 0
 
     def show(self):
         plt.ion()
-        self.loop_structure()
+        self.__loop_structure()
 
     def print(self):
         if not self.output_path:
             raise Exception('Output path not provided')
-        self.do_print = True
+        self.__do_print = True
         plt.ioff()
-        self.loop_structure()
+        self.__loop_structure()
 
     def add_param(self, file, marker='+', period='valid', color=''):
         other_result = params.ParamsArray(file)
@@ -64,23 +64,23 @@ class PlotsParamsSensitivity(object):
         self.other_results_markers.append(marker)
         self.other_results_colors.append(color)
 
-    def loop_structure(self):
-        for self.step, step in enumerate(self.results.struct):
-            title = 'Level {}'.format(self.step + 1)
+    def __loop_structure(self):
+        for self.__step, step in enumerate(self.results.struct):
+            title = 'Level {}'.format(self.__step + 1)
             self.make_plot('anb', xlabel='Number of analogues', title=title)
-            self.print_or_show(title, 'Number of analogues')
-            for self.ptor in range(0, step):
-                title = 'Level {} - {}{} {}h'.format(self.step + 1, self.results.get_variable(self.step, self.ptor),
-                                                     self.results.get_level(self.step, self.ptor),
-                                                     self.results.get_time(self.step, self.ptor))
+            self.__print_or_show(title, 'Number of analogues')
+            for self.__ptor in range(0, step):
+                title = 'Level {} - {}{} {}h'.format(self.__step + 1, self.results.get_variable(self.__step, self.__ptor),
+                                                     self.results.get_level(self.__step, self.__ptor),
+                                                     self.results.get_time(self.__step, self.__ptor))
                 self.make_plot('xmin', xlabel='Minimum longitude [°]', title=title)
-                self.print_or_show(title, 'Minimum longitude [°]')
+                self.__print_or_show(title, 'Minimum longitude [°]')
                 self.make_plot('xmax', xlabel='Maximum longitude [°]', title=title)
-                self.print_or_show(title, 'Maximum longitude [°]')
+                self.__print_or_show(title, 'Maximum longitude [°]')
                 self.make_plot('ymin', xlabel='Minimum latitude [°]', title=title)
-                self.print_or_show(title, 'Minimum latitude [°]')
+                self.__print_or_show(title, 'Minimum latitude [°]')
                 self.make_plot('ymax', xlabel='Maximum latitude [°]', title=title)
-                self.print_or_show(title, 'Maximum latitude [°]')
+                self.__print_or_show(title, 'Maximum latitude [°]')
 
     def make_plot(self, var, xlabel, title):
         self.fig = plt.figure(figsize=(5, 4))
@@ -89,30 +89,30 @@ class PlotsParamsSensitivity(object):
         # Get MC values and plot
         values = None
         if var == 'anb':
-            values = self.results.get_anbs(self.step)
+            values = self.results.get_anbs(self.__step)
         elif var == 'xmin':
-            values = self.results.get_xmins(self.step, self.ptor)
+            values = self.results.get_xmins(self.__step, self.__ptor)
         elif var == 'xmax':
-            values = self.results.get_xmaxs(self.step, self.ptor)
+            values = self.results.get_xmaxs(self.__step, self.__ptor)
         elif var == 'ymin':
-            values = self.results.get_ymins(self.step, self.ptor)
+            values = self.results.get_ymins(self.__step, self.__ptor)
         elif var == 'ymax':
-            values = self.results.get_ymaxs(self.step, self.ptor)
+            values = self.results.get_ymaxs(self.__step, self.__ptor)
         plt.scatter(values, score, c='', edgecolors=(0.2, 0.2, 0.2, 0.7), linewidths=0.5, s=30)
 
         # Other values (ex. from calibration or GAs)
         for idx, res in enumerate(self.other_results):
             other_value = None
             if var == 'anb':
-                other_value = res.get_anbs(self.step)
+                other_value = res.get_anbs(self.__step)
             elif var == 'xmin':
-                other_value = res.get_xmins(self.step, self.ptor)
+                other_value = res.get_xmins(self.__step, self.__ptor)
             elif var == 'xmax':
-                other_value = res.get_xmaxs(self.step, self.ptor)
+                other_value = res.get_xmaxs(self.__step, self.__ptor)
             elif var == 'ymin':
-                other_value = res.get_ymins(self.step, self.ptor)
+                other_value = res.get_ymins(self.__step, self.__ptor)
             elif var == 'ymax':
-                other_value = res.get_ymaxs(self.step, self.ptor)
+                other_value = res.get_ymaxs(self.__step, self.__ptor)
             other_score = self.other_results_score[idx]
             score = score.append(pd.Series(other_score))
             marker = self.other_results_markers[idx]
@@ -135,8 +135,8 @@ class PlotsParamsSensitivity(object):
         plt.title(title)
         self.fig.tight_layout()
 
-    def print_or_show(self, title, xlabel):
-        if self.do_print:
+    def __print_or_show(self, title, xlabel):
+        if self.__do_print:
             filename = title + '_' + xlabel
             filename = filename.lower()
             filename = filename.replace('-', '')

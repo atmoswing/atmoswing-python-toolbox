@@ -13,7 +13,12 @@ class ParamsArray(object):
         self.struct = []
         self.data = []
 
-    def parse_headers(self):
+    def load(self):
+        file_struct = self.__parse_headers()
+        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
+        self.__remove_failed()
+
+    def __parse_headers(self):
         fid = open(self.path, "r")
         fid.readline()
         line = fid.readline().split('\t')
@@ -76,12 +81,7 @@ class ParamsArray(object):
 
         return [cols, headers]
 
-    def load(self):
-        file_struct = self.parse_headers()
-        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
-        self.remove_failed()
-
-    def remove_failed(self):
+    def __remove_failed(self):
         if self.score == 'CRPS':
             # Remove 0s
             self.data.drop(self.data[self.data.Calib == 0].index, inplace=True)
