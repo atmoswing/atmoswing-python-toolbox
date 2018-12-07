@@ -89,25 +89,29 @@ class TimeSeriesForecast(object):
         plot_dates = self.dates + 678575 + 1
 
         # Extract quantiles
-        q000 = np.mean(np.percentile(self.analogs_values, 0, axis=2), axis=0)
-        q030 = np.mean(np.percentile(self.analogs_values, 30, axis=2), axis=0)
-        q060 = np.mean(np.percentile(self.analogs_values, 60, axis=2), axis=0)
-        q090 = np.mean(np.percentile(self.analogs_values, 90, axis=2), axis=0)
-        q100 = np.mean(np.percentile(self.analogs_values, 100, axis=2), axis=0)
+        q000 = np.nanmean(np.percentile(self.analogs_values, 0, axis=2), axis=0)
+        q030 = np.nanmean(np.percentile(self.analogs_values, 30, axis=2), axis=0)
+        q060 = np.nanmean(np.percentile(self.analogs_values, 60, axis=2), axis=0)
+        q090_all = np.percentile(self.analogs_values, 90, axis=2)
+        q090 = np.nanmean(q090_all, axis=0)
+        q100 = np.nanmean(np.percentile(self.analogs_values, 100, axis=2), axis=0)
 
         # Plot the reference values
         plot_obs = self.obs_values
-        vnans = np.isnan(q100)
         plot_obs[np.isnan(q100)] = np.nan
         self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='b', label="observations")
 
         # Plot areas and lines
         self.ax.fill_between(plot_dates, q030, q060, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
         self.ax.fill_between(plot_dates, q060, q090, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
-        self.ax.plot(plot_dates, q030, ':', linewidth=1, color='k', label="quantile 30\%")
-        self.ax.plot(plot_dates, q060, '-', linewidth=1, color='k', label="quantile 60\%")
-        self.ax.plot(plot_dates, q090, '--', linewidth=1, color='k', label="quantile 90\%")
-        self.ax.plot(plot_dates, q100, 'x', markersize=3, color='0.5', label="maximum")
+        self.ax.plot(plot_dates, q030, '--', linewidth=1, color='k', label="mean quantile 30\%")
+        self.ax.plot(plot_dates, q060, '-', linewidth=1, color='k', label="mean quantile 60\%")
+        self.ax.plot(plot_dates, q090_all[0], ':', linewidth=1, color='k', label="single quantile 90\%")
+        self.ax.plot(plot_dates, q090_all[1], ':', linewidth=1, color='k')
+        self.ax.plot(plot_dates, q090_all[2], ':', linewidth=1, color='k')
+        self.ax.plot(plot_dates, q090_all[3], ':', linewidth=1, color='k')
+        self.ax.plot(plot_dates, q090, '--', linewidth=1, color='k', label="mean quantile 90\%")
+        self.ax.plot(plot_dates, q100, 'x', markersize=3, color='0.5', label="mean maximum")
 
         # Gray nan areas
         for idx, val in enumerate(q100):
