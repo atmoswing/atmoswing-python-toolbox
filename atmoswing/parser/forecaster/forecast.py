@@ -105,9 +105,10 @@ class Forecast(object):
         self.__check_opened()
         stations_ids = np.array(self.stations_ids[:])
         i_stat = np.where(stations_ids == station_id)
-        i_stat = i_stat[0]
+        if i_stat[0].size == 0:
+            raise Exception('Station id {} not found'.format(station_id))
 
-        return i_stat
+        return i_stat[0]
 
     def get_station_name(self, station_id):
         self.__check_opened()

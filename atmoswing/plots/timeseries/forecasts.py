@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+import math
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
@@ -14,32 +16,42 @@ class TimeSeriesForecast(object):
         self.fig = None
         self.ax = None
         self.output_path = output_path
+        self.output_name = 'plot'
         self.dates = None
         self.obs_values = None
         self.analogs_values = None
         self.start = 0
         self.end = 0
-        self.ref_periods = []
-        self.ref_precip = []
-        self.__do_print = False
+        self.ref_periods = np.array([])
+        self.ref_precip = np.array([])
+        self.max_val = 0
         self.__show_legend = True
         self.__show_dots = False
 
     def show(self):
         plt.ion()
         self.__make_figure()
+        plt.show()
 
     def print(self):
         if not self.output_path:
             raise Exception('Output path not provided')
-        self.__do_print = True
         plt.ioff()
         self.__make_figure()
+        self.__print()
 
     def __make_figure(self):
         self.fig = plt.figure(figsize=(18, 4.5))
         self.ax = self.fig.add_subplot(111)
         self.build()
+
+    def __print(self):
+        self.fig.savefig(os.path.join(self.output_path, self.output_name + '.pdf'))
+        self.fig.savefig(os.path.join(self.output_path, self.output_name + '.png'), dpi=300)
+        plt.close(self.fig)
+
+    def set_output_name(self, name):
+        self.output_name = name
 
     def limit_period(self, start, end):
         # Using datetime: ex: datetime.date(1987, 7, 4)
@@ -61,6 +73,9 @@ class TimeSeriesForecast(object):
         self.obs_values = obs_values
         self.analogs_values = analogs_values
 
+    def set_max_val(self, value):
+        self.max_val = value
+
     def build(self):
         # Split data if we focus on a period
         if self.start and self.end:
@@ -71,10 +86,7 @@ class TimeSeriesForecast(object):
             self.obs_values = self.obs_values[start_array:end_array]
 
         # Convert time for plotting
-        plotdates = self.dates + 678575 + 1
-
-        # Plot the reference values
-        self.ax.plot(plotdates, self.obs_values, '-', linewidth=2, color='b', label="observations")
+        plot_dates = self.dates + 678575 + 1
 
         # Extract quantiles
         q000 = np.mean(np.percentile(self.analogs_values, 0, axis=2), axis=0)
@@ -83,18 +95,30 @@ class TimeSeriesForecast(object):
         q090 = np.mean(np.percentile(self.analogs_values, 90, axis=2), axis=0)
         q100 = np.mean(np.percentile(self.analogs_values, 100, axis=2), axis=0)
 
+        # Plot the reference values
+        plot_obs = self.obs_values
+        vnans = np.isnan(q100)
+        plot_obs[np.isnan(q100)] = np.nan
+        self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='b', label="observations")
+
         # Plot areas and lines
-        self.ax.fill_between(plotdates, q030, q060, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
-        self.ax.fill_between(plotdates, q060, q090, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
-        self.ax.plot(plotdates, q030, ':', linewidth=1, color='k', label="quantile 30\%")
-        self.ax.plot(plotdates, q060, '-', linewidth=1, color='k', label="quantile 60\%")
-        self.ax.plot(plotdates, q090, '--', linewidth=1, color='k', label="quantile 90\%")
-        self.ax.plot(plotdates, q100, 'x', markersize=3, color='0.5', label="maximum")
+        self.ax.fill_between(plot_dates, q030, q060, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
+        self.ax.fill_between(plot_dates, q060, q090, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
+        self.ax.plot(plot_dates, q030, ':', linewidth=1, color='k', label="quantile 30\%")
+        self.ax.plot(plot_dates, q060, '-', linewidth=1, color='k', label="quantile 60\%")
+        self.ax.plot(plot_dates, q090, '--', linewidth=1, color='k', label="quantile 90\%")
+        self.ax.plot(plot_dates, q100, 'x', markersize=3, color='0.5', label="maximum")
+
+        # Gray nan areas
+        for idx, val in enumerate(q100):
+            if math.isnan(val):
+                self.ax.axvspan(plot_dates[max(idx - 1, 0)], plot_dates[min(idx + 1, plot_dates.size - 1)],
+                                facecolor=[0.9, 0.9, 0.9], edgecolor='None')
 
         # Plot the dots
         if self.__show_dots:
             for i in range(self.analogs_values.shape[0]):
-                self.ax.plot(plotdates, self.analogs_values[:, i], 'ko')
+                self.ax.plot(plot_dates, self.analogs_values[:, i], 'ko')
 
         # Format the ticks
         if self.start and self.end:
@@ -115,12 +139,12 @@ class TimeSeriesForecast(object):
                 tick.tick2line.set_markersize(0)
                 tick.label1.set_horizontalalignment('center')
 
-            imid = len(plotdates) // 2
-            date = plotdates[imid]
+            i_mid = len(plot_dates) // 2
+            date = plot_dates[i_mid]
             if np.isnan(date):
-                date = plotdates[0]
+                date = plot_dates[0]
             if np.isnan(date):
-                date = plotdates[-1]
+                date = plot_dates[-1]
             y = mdates.num2date(date).year
             self.ax.set_xlabel(str(y))
 
@@ -129,19 +153,23 @@ class TimeSeriesForecast(object):
         plt.ylabel('Precipitation (mm/d)')
 
         # Draw line return periods P10
-        if not self.ref_periods and not self.ref_precip:
+        if self.ref_periods.size == 0 and self.ref_precip.size == 0:
             p10_index = np.searchsorted(self.ref_periods, 10)
             plt.axhline(y=self.ref_precip[p10_index], linewidth=2, color='r', label="return period of 10 years")
 
         # Set correct limits
-        plt.ylim(ymin=0)
+        plt.ylim(bottom=0)
+        if self.max_val > 0:
+            plt.ylim(top=self.max_val)
 
         if self.start and self.end:
             self.ax.set_xlim(self.start, self.end)
         else:
-            plt.xlim(plotdates[0], plotdates[-1])
+            plt.xlim(plot_dates[0], plot_dates[-1])
 
         # Legends
         if self.__show_legend:
             handles, labels = self.ax.get_legend_handles_labels()
             self.ax.legend(handles, labels, loc='upper left', prop=fontmanager.FontProperties(size="smaller"))
+
+        self.fig.tight_layout()
