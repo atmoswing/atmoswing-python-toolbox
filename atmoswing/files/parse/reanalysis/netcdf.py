@@ -17,7 +17,6 @@ class NetCDF(object):
         self.var_name = var_name
         self.data = []
         self.__files = None
-        self.axis_level_units = ''
         self.axis_lat = []
         self.axis_lon = []
         self.axis_time = []
@@ -63,12 +62,10 @@ class NetCDF(object):
                 self.axis_time = time
                 if has_levels:
                     self.axis_level = np.array(nc.variables[var.dimensions[1]])
-                    self.axis_level_units = nc.variables[var.dimensions[1]].units
                     self.axis_lat = np.array(nc.variables[var.dimensions[2]])
                     self.axis_lon = np.array(nc.variables[var.dimensions[3]])
                 else:
                     self.axis_level = [0]
-                    self.axis_level_units = ''
                     self.axis_lat = np.array(nc.variables[var.dimensions[1]])
                     self.axis_lon = np.array(nc.variables[var.dimensions[2]])
             else:

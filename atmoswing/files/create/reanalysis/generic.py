@@ -39,7 +39,6 @@ class Generic(object):
         var_time.long_name = 'time'
         var_time.units = 'days since 1858-11-17 00:00:00.0 +0:00'
         var_time.calendar = 'standard'
-        var_level.units = self.ref_data.axis_level_units
         var_lat.setncattr('name', 'lat')
         var_lat.long_name = 'latitude'
         var_lat.units = 'degree_north'
