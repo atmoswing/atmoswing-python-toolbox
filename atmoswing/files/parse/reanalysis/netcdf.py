@@ -8,8 +8,8 @@ from netCDF4 import Dataset
 from atmoswing.external import jdcal
 
 
-class CFSR(object):
-    """Extract CFSR data"""
+class NetCDF(object):
+    """Extract NetCDF data"""
 
     def __init__(self, directory, file_pattern, var_name):
         self.file_pattern = file_pattern
