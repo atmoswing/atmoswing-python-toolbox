@@ -55,6 +55,7 @@ for file in files_list:
 
     reanalysis = netcdf.NetCDF(directory=dir_origin_files, file_pattern='*.nc', var_name=var_name_origin)
     reanalysis.load()
+    reanalysis.replace_nans(-32767.0, 0)
     new_reanalysis = generic.Generic(directory=dir_target_files, var_name=var_name_target, ref_data=reanalysis)
     new_reanalysis.generate()
 

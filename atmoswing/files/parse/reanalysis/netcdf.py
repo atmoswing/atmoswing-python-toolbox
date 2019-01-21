@@ -74,6 +74,9 @@ class NetCDF(object):
 
             nc.close()
 
+    def replace_nans(self, nan_val, new_val):
+        self.data[self.data == nan_val] = new_val
+
     def __convert_time(self, nc, var, time):
         time_units = nc.variables[var.dimensions[0]].units
         str_space = time_units.find(' ')
