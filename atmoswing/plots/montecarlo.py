@@ -3,7 +3,7 @@
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
-from atmoswing.parser.optimizer import params
+from atmoswing.files.parse.optimizer import params
 
 
 class PlotsParamsSensitivity(object):

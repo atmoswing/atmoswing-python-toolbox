@@ -3,8 +3,8 @@
 # Imports
 from atmoswing.plots.timeseries import forecasts
 from atmoswing.external import jdcal
-from atmoswing.parser.obs import idaweb
-from atmoswing.parser.forecaster import forecast
+from atmoswing.files.parse.obs import idaweb
+from atmoswing.files.parse.forecaster import forecast
 import numpy as np
 import math
 
@@ -16,7 +16,7 @@ start = [2016, 1]
 end = [2018, 12]
 nb_months = 6
 methods = ['PC-AZ2', 'PC-AZ2-AHI2', 'PC-AZ4o', 'PC-AZ4o-AHI2o']
-use_initial_analogs_nb = False
+use_initial_analogs_nb = True
 
 directory_fcts = 'D:\\Projects\\ANALOGS\\Analyses\\Forecasts performance\\Forecasts\\Suisse - VS\\v 1.2-1.3\\'
 directory_obs = u'D:\\Projects\\ANALOGS\\Analyses\\Forecasts performance\\Observations\\'
