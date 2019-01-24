@@ -19,7 +19,7 @@ class Generic(object):
 
         file_name = self.var_name + '.nc'
         file_path = os.path.join(self.directory, file_name)
-        nc = Dataset(file_path, "w", format="NETCDF4")
+        nc = Dataset(file_path, "w", format="NETCDF3_CLASSIC")
 
         # Dimensions
         dim_time = nc.createDimension("time", shape[0])
@@ -32,7 +32,7 @@ class Generic(object):
         var_level = nc.createVariable("level", "f4", ("level",))
         var_lat = nc.createVariable("lat", "f4", ("lat",))
         var_lon = nc.createVariable("lon", "f4", ("lon",))
-        var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",), zlib=True)
+        var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",))
 
         # Attributes
         var_time.setncattr('name', 'time')
