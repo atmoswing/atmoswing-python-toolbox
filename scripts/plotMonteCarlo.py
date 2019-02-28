@@ -2,7 +2,7 @@
 
 from atmoswing.plots import montecarlo
 
-baseDir = 'D:\\Projects\\ANALOGS\\Analyses\\Parameters space\\'
+base_dir = 'D:\\Projects\\ANALOGS\\Analyses\\Parameters space\\'
 
 # 2Z
 file = 'Monte Carlo\\Results\\51035\\results\\20181122-1551_station_35_tested_parameters.txt'
@@ -123,24 +123,24 @@ file_calib_vp = 'Calibration\\Results\\2570352\\results\\20181123-0956_station_3
 #file_ga13 = 'GAs\\Results\\17570351\\results\\20181125-0536_station_35_best_individual.txt'
 #file_ga14 = 'GAs\\Results\\17570352\\results\\20181126-0351_station_35_best_individual.txt'
 
-output_path = baseDir + '_Plots\\'
+output_path = base_dir + '_Plots\\'
 
-mc = montecarlo.PlotsParamsSensitivity(baseDir + file, output_path)
-mc.add_param(baseDir + file_calib_cp, 's', 'calib')
-mc.add_param(baseDir + file_calib_vp, 's', 'valid')
-mc.add_param(baseDir + file_ga1, 'v', 'calib')
-mc.add_param(baseDir + file_ga2, 'v', 'valid')
-mc.add_param(baseDir + file_ga3, 'v', 'calib')
-mc.add_param(baseDir + file_ga4, 'v', 'valid')
-mc.add_param(baseDir + file_ga5, 'v', 'calib')
-mc.add_param(baseDir + file_ga6, 'v', 'valid')
-mc.add_param(baseDir + file_ga7, 'v', 'calib')
-mc.add_param(baseDir + file_ga8, 'v', 'valid')
-mc.add_param(baseDir + file_ga9, 'v', 'calib')
-mc.add_param(baseDir + file_ga10, 'v', 'valid')
-mc.add_param(baseDir + file_ga11, 'v', 'calib')
-mc.add_param(baseDir + file_ga12, 'v', 'valid')
-mc.add_param(baseDir + file_ga13, 'v', 'calib')
-mc.add_param(baseDir + file_ga14, 'v', 'valid')
+mc = montecarlo.PlotsParamsSensitivity(base_dir + file, output_path)
+mc.add_param(base_dir + file_calib_cp, 's', 'calib')
+mc.add_param(base_dir + file_calib_vp, 's', 'valid')
+mc.add_param(base_dir + file_ga1, 'v', 'calib')
+mc.add_param(base_dir + file_ga2, 'v', 'valid')
+mc.add_param(base_dir + file_ga3, 'v', 'calib')
+mc.add_param(base_dir + file_ga4, 'v', 'valid')
+mc.add_param(base_dir + file_ga5, 'v', 'calib')
+mc.add_param(base_dir + file_ga6, 'v', 'valid')
+mc.add_param(base_dir + file_ga7, 'v', 'calib')
+mc.add_param(base_dir + file_ga8, 'v', 'valid')
+mc.add_param(base_dir + file_ga9, 'v', 'calib')
+mc.add_param(base_dir + file_ga10, 'v', 'valid')
+mc.add_param(base_dir + file_ga11, 'v', 'calib')
+mc.add_param(base_dir + file_ga12, 'v', 'valid')
+mc.add_param(base_dir + file_ga13, 'v', 'calib')
+mc.add_param(base_dir + file_ga14, 'v', 'valid')
 mc.print()
 # mc.show()

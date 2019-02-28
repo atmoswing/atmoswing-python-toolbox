@@ -86,6 +86,9 @@ class ParamsArray(object):
             # Remove 0s
             self.data.drop(self.data[self.data.Calib == 0].index, inplace=True)
 
+    def get_station(self):
+        return self.id
+
     def get_anbs(self, step):
         return self.data['Anb_{}'.format(step)]
 
@@ -96,14 +99,41 @@ class ParamsArray(object):
         var = self.data['Variable_{}_{}'.format(step, ptor)].iloc[index]
         if 'hgt' in var:
             var = 'Z'
-        elif 'tcw' in var:
-            var = 'TCW'
-        elif 'omega' in var:
+        elif 'pl/z' in var:
+            var = 'Z'
+        elif 'pl/w' in var:
             var = 'W'
+        elif 'pl/vo' in var:
+            var = 'VO'
+        elif 'pl/v' in var:
+            var = 'V'
+        elif 'pl/u' in var:
+            var = 'U'
+        elif 'pl/d' in var:
+            var = 'D'
+        elif 'pl/pv' in var:
+            var = 'PV'
+        elif 'sff/strd' in var:
+            var = 'STRD'
+        elif 'sff/str' in var:
+            var = 'STR'
         elif 'press/rh' in var:
             var = 'RH'
         elif 'press/t' in var:
             var = 'T'
+        elif 'msl/pres' in var:
+            var = 'SLP'
+        elif 'tcw' in var:
+            var = 'TCW'
+        elif 'omega' in var:
+            var = 'W'
+        return var
+
+    def get_variable_and_level(self, step, ptor, index=0):
+        var = self.get_variable(step, ptor)
+        level = self.get_level(step, ptor)
+        if level != 0:
+            var += str(level)
         return var
 
     def get_levels(self, step, ptor):
@@ -140,6 +170,12 @@ class ParamsArray(object):
 
     def get_weights(self, step, ptor):
         return self.data['Weight_{}_{}'.format(step, ptor)]
+
+    def get_criterion(self, step, ptor, index=0):
+        criterion = self.data['Criteria_{}_{}'.format(step, ptor)].iloc[index]
+        if 'grads' in criterion:
+            criterion = criterion[0:-5]
+        return criterion
 
     def get_criteria(self, step, ptor):
         return self.data['Criteria_{}_{}'.format(step, ptor)]
