@@ -96,11 +96,13 @@ class ParamsArray(object):
         return self.data['Variable_{}_{}'.format(step, ptor)]
 
     def get_variable(self, step, ptor, index=0):
-        var = self.data['Variable_{}_{}'.format(step, ptor)].iloc[index]
+        var = str(self.data['Variable_{}_{}'.format(step, ptor)].iloc[index])
         if 'hgt' in var:
             var = 'Z'
         elif 'pl/z' in var:
             var = 'Z'
+        elif 'pl/gpa' in var:
+            var = 'ZA'
         elif 'pl/w' in var:
             var = 'W'
         elif 'pl/vo' in var:
@@ -111,6 +113,8 @@ class ParamsArray(object):
             var = 'U'
         elif 'pl/d' in var:
             var = 'D'
+        elif 'pl/t' in var:
+            var = 'T'
         elif 'pl/pv' in var:
             var = 'PV'
         elif 'sff/strd' in var:
@@ -123,6 +127,8 @@ class ParamsArray(object):
             var = 'T'
         elif 'msl/pres' in var:
             var = 'SLP'
+        elif 'ea/cwat' in var:
+            var = 'CWAT'
         elif 'tcw' in var:
             var = 'TCW'
         elif 'omega' in var:

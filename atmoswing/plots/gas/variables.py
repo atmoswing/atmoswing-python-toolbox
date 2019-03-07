@@ -21,6 +21,8 @@ class PlotsGAsVariables(object):
         self.marker_alpha = 1
         self.data = []
         self.vars = []
+        self.vars_default = ['PV950', 'Z600', 'Z700', 'Z800', 'Z850', 'Z900', 'Z950', 'ZA1000', 'V700', 'V800', 'VO900', 'W600', 'W700', 'W800', 'W850', 'W900', 'W950', 'W1000', 'D800', 'D850', 'D900', 'T850', 'CWAT', 'SLP', 'STR', 'STRD']
+        self.use_vars_default = True
         self.stations = []
         self.crit = ['RMSE', 'S0', 'S1', 'S2', 'MD', 'DSD', 'DMV']
         self.colors = plt.get_cmap('tab10').colors
@@ -67,6 +69,17 @@ class PlotsGAsVariables(object):
         self.vars = self.data['var']
         self.vars.drop_duplicates(inplace=True)
         self.vars = self.vars.sort_values(ascending=False)
+        if self.use_vars_default:
+            old_vars = list(self.vars)
+            new_vars = []
+            for var in self.vars_default:
+                if var in old_vars:
+                    new_vars.append(var)
+                    old_vars.remove(var)
+            if len(old_vars) > 0:
+                new_vars += old_vars
+            new_vars.reverse()
+            self.vars = pd.Series(new_vars)
         self.vars.reset_index(drop=True, inplace=True)
 
     def __list_stations(self):
