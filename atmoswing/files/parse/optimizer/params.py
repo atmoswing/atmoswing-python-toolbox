@@ -105,30 +105,76 @@ class ParamsArray(object):
             var = 'ZA'
         elif 'pl/w' in var:
             var = 'W'
-        elif 'pl/vo' in var:
+        elif 'pl/vvel' in var:
+            var = 'W'
+        elif 'pl/vo' in var:  # Vorticity (relative) (ERA-int)
             var = 'VO'
+        elif 'pl/vpot' in var:  # Velocity potential (JRA55)
+            var = 'VPOT'
+        elif 'pl/vgrd' in var:
+            var = 'V'
         elif 'pl/v' in var:
             var = 'V'
         elif 'pl/u' in var:
             var = 'U'
+        elif 'pl/depr' in var:  # Dew-point depression (JRA55)
+            var = 'DEPR'
+        elif 'pl/reld' in var:  # Relative divergence (JRA55)
+            var = 'RD'
         elif 'pl/d' in var:
             var = 'D'
         elif 'pl/t' in var:
             var = 'T'
         elif 'pl/pv' in var:
             var = 'PV'
+        elif 'pl/rh' in var:
+            var = 'RH'
+        elif 'pl/r' in var:
+            var = 'R'
+        elif 'pv/z' in var:
+            var = 'PV/Z'
+        elif 'pv/v' in var:
+            var = 'PV/V'
+        elif 'pt/v' in var:
+            var = 'PT/V'
+        elif 'pt/q' in var:
+            var = 'PT/Q'
+        elif 'pt/mont' in var:
+            var = 'PT/MONT'
         elif 'sff/strd' in var:
             var = 'STRD'
         elif 'sff/str' in var:
             var = 'STR'
+        elif 'sff/ssrd' in var:
+            var = 'SSRD'
+        elif 'sff/ssr' in var:
+            var = 'SSR'
+        elif 'sff/cape' in var:
+            var = 'CAPE'
+        elif 'sfa/v10' in var:
+            var = 'V10'
+        elif 'sfa/u10' in var:
+            var = 'U10'
+        elif 'sfa/msl' in var:
+            var = 'SLP'
+        elif 'sfa/rh' in var:
+            var = 'RH'
         elif 'press/rh' in var:
             var = 'RH'
         elif 'press/t' in var:
             var = 'T'
+        elif 'sfa/prmsl' in var:
+            var = 'SLP'
         elif 'msl/pres' in var:
             var = 'SLP'
+        elif 'plf/cwat' in var:
+            var = 'CWAT'
         elif 'ea/cwat' in var:
             var = 'CWAT'
+        elif 'tcf/cw' in var:
+            var = 'CWAT'
+        elif 'tc/vwv' in var:
+            var = 'VWV'
         elif 'tcw' in var:
             var = 'TCW'
         elif 'omega' in var:
@@ -136,8 +182,8 @@ class ParamsArray(object):
         return var
 
     def get_variable_and_level(self, step, ptor, index=0):
-        var = self.get_variable(step, ptor)
-        level = self.get_level(step, ptor)
+        var = self.get_variable(step, ptor, index)
+        level = self.get_level(step, ptor, index)
         if level != 0:
             var += str(level)
         return var
