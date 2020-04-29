@@ -89,8 +89,17 @@ class ParamsArray(object):
     def get_station(self):
         return self.id
 
+    def get_station_int(self):
+        return int(self.id)
+
+    def get_steps_nb(self):
+        return len(self.struct)
+
+    def get_ptors_nb(self, step):
+        return self.struct[step]
+
     def get_anbs(self, step):
-        return self.data['Anb_{}'.format(step)]
+        return int(self.data['Anb_{}'.format(step)])
 
     def get_variables(self, step, ptor):
         return self.data['Variable_{}_{}'.format(step, ptor)]
@@ -118,6 +127,8 @@ class ParamsArray(object):
         elif 'pl/u' in var:
             var = 'U'
         elif 'pl/depr' in var:  # Dew-point depression (JRA55)
+            var = 'DEPR'
+        elif 'sfa/depr' in var:  # Dew-point depression (JRA55)
             var = 'DEPR'
         elif 'pl/reld' in var:  # Relative divergence (JRA55)
             var = 'RD'

@@ -41,6 +41,7 @@ class TimeSeriesForecast(object):
         self.__print()
 
     def __make_figure(self):
+        plt.rcParams.update({'font.size': 15})
         self.fig = plt.figure(figsize=(18, 4.5))
         self.ax = self.fig.add_subplot(111)
         self.build()
@@ -99,7 +100,7 @@ class TimeSeriesForecast(object):
         # Plot the reference values
         plot_obs = self.obs_values
         plot_obs[np.isnan(q100)] = np.nan
-        self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='b', label="observations")
+        self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='r', label="observations")
 
         # Plot areas and lines
         self.ax.fill_between(plot_dates, q030, q060, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
@@ -174,6 +175,6 @@ class TimeSeriesForecast(object):
         # Legends
         if self.__show_legend:
             handles, labels = self.ax.get_legend_handles_labels()
-            self.ax.legend(handles, labels, loc='upper left', prop=fontmanager.FontProperties(size="smaller"))
+            self.ax.legend(handles, labels, loc='upper left')  # prop=fontmanager.FontProperties(size="smaller")
 
         self.fig.tight_layout()

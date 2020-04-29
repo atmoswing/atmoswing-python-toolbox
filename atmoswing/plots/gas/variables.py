@@ -164,7 +164,7 @@ class PlotsGAsVariables(object):
             self.data.loc[indexes, 'marker_size'] = sizes
 
     def __make_plot(self):
-        fig_height = float(len(self.vars)) * 4.0/25.0
+        fig_height = 0.66 + float(len(self.vars)) * 3.7/25.0
         self.fig = plt.figure(figsize=(10, fig_height))
         x = np.arange(1, len(self.data) + 1)
         plt.grid(axis='y', alpha=0.2)
