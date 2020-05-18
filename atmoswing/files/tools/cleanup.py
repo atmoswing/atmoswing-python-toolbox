@@ -5,9 +5,13 @@ import glob
 
 
 def log_file_is_empty(file):
+    if os.stat(file).st_size == 0:
+        return True
+
     with open(file) as f:
         if 'Optimization has already converged.' in f.read():
             return True
+
     return False
 
 
