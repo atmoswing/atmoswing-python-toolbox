@@ -18,5 +18,5 @@ setup(
     author_email='pascal.horton@giub.unibe.ch',
     url='https://github.com/atmoswing/tools-py',
     license=license,
-    packages=find_packages(exclude=('tests', 'scripts'))
+    packages=find_packages(exclude=('tests', 'examples'))
 )
