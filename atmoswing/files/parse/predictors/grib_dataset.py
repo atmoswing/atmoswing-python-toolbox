@@ -79,6 +79,8 @@ class Grib(Dataset):
                 if self.data_units != units:
                     raise Exception("Only 1 type of data per file supported so far.")
 
+                codes_release(msgid)
+
             f.close()
 
     def __extract_axes(self, msgid):
