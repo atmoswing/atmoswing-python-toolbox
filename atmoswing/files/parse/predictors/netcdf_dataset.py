@@ -6,22 +6,15 @@ import dateutil.parser
 import numpy as np
 from netCDF4 import Dataset
 from atmoswing.external import jdcal
+from atmoswing.files.parse.predictors.dataset import Dataset
 
 
-class NetCDF(object):
+class NetCDF(Dataset):
     """Extract NetCDF data"""
 
     def __init__(self, directory, file_pattern, var_name):
-        self.file_pattern = file_pattern
-        self.directory = directory
+        super().__init__(directory, file_pattern)
         self.var_name = var_name
-        self.data = []
-        self.data_units = None
-        self.__files = None
-        self.axis_lat = []
-        self.axis_lon = []
-        self.axis_time = []
-        self.axis_level = []
 
     def load(self):
         self.__list()
@@ -74,9 +67,6 @@ class NetCDF(object):
                 self.axis_time = np.append(self.axis_time, time, axis=0)
 
             nc.close()
-
-    def replace_nans(self, nan_val, new_val):
-        self.data[self.data == nan_val] = new_val
 
     def __convert_time(self, nc, var, time):
         time_units = nc.variables[var.dimensions[0]].units

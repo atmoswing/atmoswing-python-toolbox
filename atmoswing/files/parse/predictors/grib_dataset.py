@@ -6,22 +6,15 @@ import dateutil.parser
 import numpy as np
 from eccodes import *
 from atmoswing.external import jdcal
+from atmoswing.files.parse.predictors.dataset import Dataset
 
 
-class Grib(object):
+class Grib(Dataset):
     """Extract Grib data"""
 
     def __init__(self, directory, file_pattern):
+        super().__init__(directory, file_pattern)
         self.grib_version = 0
-        self.file_pattern = file_pattern
-        self.directory = directory
-        self.data = []
-        self.data_units = None
-        self.__files = None
-        self.axis_lat = []
-        self.axis_lon = []
-        self.axis_time = []
-        self.axis_level = []
         self.param_code_1 = []
         self.param_code_2 = []
         self.param_code_3 = []
@@ -158,20 +151,3 @@ class Grib(object):
         self.param_code_1.append(discipline)
         self.param_code_2.append(category)
         self.param_code_3.append(number)
-
-    def replace_nans(self, nan_val, new_val):
-        self.data[self.data == nan_val] = new_val
-
-    def standardize(self, mode=DOMAIN_WISE):
-        if mode == DOMAIN_WISE:
-            mean = np.mean(self.data)
-            sd = np.std(self.data)
-            print("mean = {}, sd = {}".format(mean, sd))
-            self.data = (self.data - mean) / sd
-        elif mode == POINT_WISE:
-            mean = np.mean(self.data, axis=0)
-            sd = np.std(self.data, axis=0)
-            print("mean = {}, sd = {}".format(mean, sd))
-            self.data = (self.data - mean) / sd
-        else:
-            raise Exception("Wrong mode for the standardization.")

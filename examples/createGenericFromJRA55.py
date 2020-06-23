@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os
-from atmoswing.files.parse.predictors import netcdf
+from atmoswing.files.parse.predictors import netcdf_dataset
 from atmoswing.files.create.predictors import generic
 
 files_list = [['anl_column125', 'anl_column125.054_pwat.*', 'PWAT_GDS0_EATM', 'pwat'],
@@ -68,7 +68,7 @@ for file in files_list:
     var_name_origin = file[2]
     var_name_target = file[3]
 
-    reanalysis = netcdf.NetCDF(directory=dir_origin_files, file_pattern=file[1], var_name=var_name_origin)
+    reanalysis = netcdf_dataset.NetCDF(directory=dir_origin_files, file_pattern=file[1], var_name=var_name_origin)
     reanalysis.load()
     new_reanalysis = generic.Generic(directory=dir_target_files, var_name=var_name_target, ref_data=reanalysis)
     new_reanalysis.generate()

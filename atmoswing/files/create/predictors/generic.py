@@ -3,6 +3,10 @@
 import os
 from netCDF4 import Dataset
 
+NETCDF_3 = 0
+""" NetCDF 3 format - larger but faster """
+NETCDF_4 = 1
+""" NetCDF 4 format - smaller but longer to read """
 
 class Generic(object):
     """Generic predictors dataset"""
@@ -14,12 +18,15 @@ class Generic(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    def generate(self):
+    def generate(self, format=NETCDF_3):
         shape = self.ref_data.data.shape  # time, level, lat, lon
 
         file_name = self.var_name + '.nc'
         file_path = os.path.join(self.directory, file_name)
-        nc = Dataset(file_path, "w", format="NETCDF3_CLASSIC")
+        if format == NETCDF_3:
+            nc = Dataset(file_path, "w", format="NETCDF3_CLASSIC")
+        else:
+            nc = Dataset(file_path, "w", format="NETCDF4")
 
         # Dimensions
         dim_time = nc.createDimension("time", shape[0])
