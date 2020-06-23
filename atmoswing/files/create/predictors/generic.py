@@ -29,7 +29,7 @@ class Generic(object):
             nc = Dataset(file_path, "w", format="NETCDF4")
 
         # Global attributes
-        nc.standardized = False
+        nc.standardized = 0
         if self.ref_data.is_standardized:
             nc.standardization_mean = self.ref_data.mean
             nc.standardization_sd = self.ref_data.sd

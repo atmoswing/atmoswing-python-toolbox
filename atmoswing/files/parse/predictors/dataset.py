@@ -35,13 +35,14 @@ class Dataset(object):
             self.data = (self.data - self.mean) / self.sd
         elif mode == POINT_WISE:
             raise Exception("Not tested and likely not working properly.")
-
             self.mean = np.mean(self.data, axis=0)
             self.sd = np.std(self.data, axis=0)
             print("mean = {}, sd = {}".format(self.mean, self.sd))
             self.data = (self.data - self.mean) / self.sd
         else:
             raise Exception("Wrong mode for the standardization.")
+
+        self.is_standardized = True
 
     def replace_nans(self, nan_val, new_val):
         self.data[self.data == nan_val] = new_val
