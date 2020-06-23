@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import os
-from atmoswing.files.parse.reanalysis import netcdf
-from atmoswing.files.create.reanalysis import generic
+from atmoswing.files.parse.predictors import netcdf
+from atmoswing.files.create.predictors import generic
 
 files_list = [['anl_column125', 'anl_column125.054_pwat.*', 'PWAT_GDS0_EATM', 'pwat'],
               ['anl_column125', 'anl_column125.152_vwv.*', 'VWV_GDS0_EATM', 'vwv'],

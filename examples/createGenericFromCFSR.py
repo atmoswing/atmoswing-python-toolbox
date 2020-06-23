@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import os
-from atmoswing.files.parse.reanalysis import netcdf
-from atmoswing.files.create.reanalysis import generic
+from atmoswing.files.parse.predictors import netcdf
+from atmoswing.files.create.predictors import generic
 
 dir_origin = '...'
 dir_target = '...'

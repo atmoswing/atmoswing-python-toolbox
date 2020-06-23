@@ -5,7 +5,7 @@ from netCDF4 import Dataset
 
 
 class Generic(object):
-    """Generic reanalysis dataset"""
+    """Generic predictors dataset"""
 
     def __init__(self, directory, var_name, ref_data):
         self.directory = directory

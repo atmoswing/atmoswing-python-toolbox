@@ -11,11 +11,10 @@ from atmoswing.external import jdcal
 class Grib(object):
     """Extract Grib data"""
 
-    def __init__(self, directory, file_pattern, var_name):
+    def __init__(self, directory, file_pattern):
         self.grib_version = 0
         self.file_pattern = file_pattern
         self.directory = directory
-        self.var_name = var_name
         self.data = []
         self.data_units = None
         self.__files = None
@@ -72,8 +71,8 @@ class Grib(object):
                 self.__extract_grib_code(msgid)
 
                 data = codes_get_array(msgid, "values")
-                n_lats = len(self.axis_lat[len(self.axis_lat) - 1])
-                n_lons = len(self.axis_lon[len(self.axis_lon) - 1])
+                n_lats = len(self.axis_lat)
+                n_lons = len(self.axis_lon)
                 if len(self.data) == 0:
                     self.data = data.reshape((1, 1, n_lats, n_lons))
                 else:
@@ -99,8 +98,17 @@ class Grib(object):
         if lon_end < lon_start:
             lon_start -= 360
 
-        self.axis_lat.append(np.linspace(lat_start, lat_end, n_lats))
-        self.axis_lon.append(np.linspace(lon_start, lon_end, n_lons))
+        axis_lat = np.linspace(lat_start, lat_end, n_lats)
+        axis_lon = np.linspace(lon_start, lon_end, n_lons)
+
+        if len(self.axis_lat) == 0:
+            self.axis_lat = axis_lat
+            self.axis_lon = axis_lon
+        else:
+            if not np.array_equal(self.axis_lat, axis_lat):
+                raise Exception("Only 1 extent per file is supported so far.")
+            if not np.array_equal(self.axis_lon, axis_lon):
+                raise Exception("Only 1 extent per file is supported so far.")
 
     def __extract_level(self, msgid):
         level = codes_get_double(msgid, "level")
@@ -108,7 +116,11 @@ class Grib(object):
         if type == "isobaricInPa":
             level /= 100
 
-        self.axis_level.append(level)
+        if len(self.axis_level) == 0:
+            self.axis_level.append(level)
+        else:
+            if self.axis_level[0] != level:
+                raise Exception("Only 1 level per file is supported so far.")
 
     def __extract_time(self, msgid):
         ref_date = dateutil.parser.parse(codes_get_string(msgid, "dataDate"))
@@ -149,3 +161,17 @@ class Grib(object):
 
     def replace_nans(self, nan_val, new_val):
         self.data[self.data == nan_val] = new_val
+
+    def standardize(self, mode=DOMAIN_WISE):
+        if mode == DOMAIN_WISE:
+            mean = np.mean(self.data)
+            sd = np.std(self.data)
+            print("mean = {}, sd = {}".format(mean, sd))
+            self.data = (self.data - mean) / sd
+        elif mode == POINT_WISE:
+            mean = np.mean(self.data, axis=0)
+            sd = np.std(self.data, axis=0)
+            print("mean = {}, sd = {}".format(mean, sd))
+            self.data = (self.data - mean) / sd
+        else:
+            raise Exception("Wrong mode for the standardization.")
