@@ -28,6 +28,12 @@ class Generic(object):
         else:
             nc = Dataset(file_path, "w", format="NETCDF4")
 
+        # Global attributes
+        nc.standardized = False
+        if self.ref_data.is_standardized:
+            nc.standardization_mean = self.ref_data.mean
+            nc.standardization_sd = self.ref_data.sd
+
         # Dimensions
         dim_time = nc.createDimension("time", shape[0])
         dim_level = nc.createDimension("level", shape[1])
