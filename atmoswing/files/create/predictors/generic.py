@@ -41,11 +41,17 @@ class Generic(object):
         dim_lon = nc.createDimension("lon", shape[3])
 
         # Variables
-        var_time = nc.createVariable("time", "f4", ("time",))
         var_level = nc.createVariable("level", "f4", ("level",))
         var_lat = nc.createVariable("lat", "f4", ("lat",))
         var_lon = nc.createVariable("lon", "f4", ("lon",))
-        var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",))
+        if format == NETCDF_3:
+            var_time = nc.createVariable("time", "f4", ("time",))
+            var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",))
+        else:
+            var_time = nc.createVariable("time", "f4", ("time",),
+                                         zlib=True, complevel=6, least_significant_digit=4)
+            var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",),
+                                         zlib=True, complevel=6, least_significant_digit=4)
 
         # Attributes
         var_time.setncattr('name', 'time')
