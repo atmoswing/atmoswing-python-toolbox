@@ -51,7 +51,7 @@ class Generic(object):
             var_time = nc.createVariable("time", "f4", ("time",),
                                          zlib=True, complevel=6, least_significant_digit=4)
             var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",),
-                                         zlib=True, complevel=6, least_significant_digit=4)
+                                         zlib=True, complevel=6)
 
         # Attributes
         var_time.setncattr('name', 'time')
