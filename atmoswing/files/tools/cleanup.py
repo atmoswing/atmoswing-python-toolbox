@@ -32,3 +32,18 @@ def cleanup_duplicate_ini_files(base_path):
         for f in files:
             os.remove(f)
             print('{} removed'.format(f))
+
+
+def cleanup_old_generations(base_path):
+    for x in os.listdir(base_path):
+        path = os.path.join(base_path, x, 'results')
+        files_generations = glob.glob(path + '/*generations.txt.gz')
+        files_generations.sort()
+        files_operators = glob.glob(path + '/*operators.txt.gz')
+        files_operators.sort()
+        for f in files_generations[:-1]:
+            os.remove(f)
+            print('{} removed'.format(f))
+        for f in files_operators[:-1]:
+            os.remove(f)
+            print('{} removed'.format(f))
