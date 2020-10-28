@@ -4,6 +4,7 @@ import os
 import glob
 import gzip
 import shutil
+import zipfile
 
 
 def pack_file(f):
@@ -36,3 +37,21 @@ def compress_optimization_outputs(base_path):
                 pack_file(f)
             for f in files_operators[:-1]:
                 pack_file(f)
+
+
+def compress_log_files(base_path):
+    for x in os.listdir(base_path):
+        path = os.path.join(base_path, x)
+        print(path)
+        log_file = glob.glob(path + '/AtmoSwingOptimizer*.log')
+        if len(log_file) > 0:
+            zip_obj = zipfile.ZipFile(path + '/log.zip', 'w', zipfile.ZIP_DEFLATED)
+            for f in log_file:
+                file_name = f.replace(path, '')
+                file_name = file_name[1:]
+                zip_obj.write(f, file_name)
+                os.remove(f)
+                print(file_name + ' compressed')
+            zip_obj.close()
+        else:
+            print("No log file found.")
