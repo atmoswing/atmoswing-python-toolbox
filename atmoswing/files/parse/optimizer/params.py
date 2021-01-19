@@ -134,22 +134,38 @@ class ParamsArray(object):
             var = 'RD'
         elif 'pl/d' in var:
             var = 'D'
+        elif 'pt/d' in var:
+            var = 'PT/D'
         elif 'pl/t' in var:
             var = 'T'
         elif 'pl/pv' in var:
             var = 'PV'
+        elif 'pt/pv' in var:
+            var = 'PT/PV'
         elif 'pl/rh' in var:
             var = 'RH'
         elif 'pl/r' in var:
-            var = 'R'
+            var = 'RH'
         elif 'pv/z' in var:
             var = 'PV/Z'
         elif 'pv/v' in var:
             var = 'PV/V'
+        elif 'pv/u' in var:
+            var = 'PV/U'
         elif 'pt/v' in var:
             var = 'PT/V'
+        elif 'pt/u' in var:
+            var = 'PT/U'
+        elif 'pv/pres' in var:
+            var = 'PV/PRES'
+        elif 'pt/pres' in var:
+            var = 'PT/PRES'
+        elif 'pv/pt' in var:
+            var = 'PV/PT'
         elif 'pt/q' in var:
-            var = 'PT/Q'
+            var = 'PT/SH'
+        elif 'pl/q' in var:
+            var = 'PL/SH'
         elif 'pt/mont' in var:
             var = 'PT/MONT'
         elif 'sff/strd' in var:
@@ -162,6 +178,8 @@ class ParamsArray(object):
             var = 'SSR'
         elif 'sff/cape' in var:
             var = 'CAPE'
+        elif 'sff/ie' in var:
+            var = 'IE'
         elif 'sfa/v10' in var:
             var = 'V10'
         elif 'sfa/u10' in var:
@@ -174,6 +192,14 @@ class ParamsArray(object):
             var = 'RH'
         elif 'press/t' in var:
             var = 'T'
+        elif 'sfa/t2m' in var:
+            var = 'T2m'
+        elif 'sfa/sst' in var:
+            var = 'SST'
+        elif 'sfa/d2m' in var:
+            var = 'D2m'
+        elif 'sfa/sd' in var:
+            var = 'SD'
         elif 'sfa/prmsl' in var:
             var = 'SLP'
         elif 'msl/pres' in var:
@@ -230,6 +256,9 @@ class ParamsArray(object):
 
     def get_yptsnbs(self, step, ptor):
         return self.data['yPtsNb_{}_{}'.format(step, ptor)]
+
+    def get_weight(self, step, ptor, index=0):
+        return self.data['Weight_{}_{}'.format(step, ptor)].iloc[index]
 
     def get_weights(self, step, ptor):
         return self.data['Weight_{}_{}'.format(step, ptor)]

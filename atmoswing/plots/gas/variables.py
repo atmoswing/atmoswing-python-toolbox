@@ -18,6 +18,8 @@ class PlotsGAsVariables(object):
         self.output_path = output_path
         self.marker_size_max = 50
         self.marker_size_range = 0.05
+        self.marker_size_on_weight = False
+        self.filter_min_weight = 0.05
         self.marker_alpha = 1
         self.struct = []
         self.data = []
@@ -31,14 +33,10 @@ class PlotsGAsVariables(object):
         self.colors = plt.get_cmap('tab10').colors
         self.markers = ['o', 'v', 's', 'P', '^', '<', '>', '8', 'p', '*', 'h', 'H', 'D', 'd', 'X']
         self.files = glob.glob(base_dir + '/**/*best_individual.txt', recursive=True)
+        self.load()
 
     def show(self):
         plt.ion()
-        self.__parse_results()
-        self.__list_stations()
-        self.__drop_bad_scores()
-        self.__list_variables()
-        self.__add_variable_index()
         self.__set_criteria_color()
         self.__set_marker_size()
         self.__make_plot()
@@ -48,11 +46,6 @@ class PlotsGAsVariables(object):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self.__parse_results()
-        self.__list_stations()
-        self.__drop_bad_scores()
-        self.__list_variables()
-        self.__add_variable_index()
         self.__set_criteria_color()
         self.__set_marker_size()
         self.__make_plot()
@@ -61,6 +54,7 @@ class PlotsGAsVariables(object):
     def load(self):
         self.__parse_results()
         self.__list_stations()
+        self.__drop_bad_scores()
         self.__list_variables()
         self.__add_variable_index()
 
@@ -76,6 +70,7 @@ class PlotsGAsVariables(object):
             for ptor in range(ptors):
                 labels_slct.append('var_{}_{}'.format(step, ptor))
                 labels_slct.append('criterion_{}_{}'.format(step, ptor))
+                labels_slct.append('weight_{}_{}'.format(step, ptor))
 
         # Extract values
         for filename in self.files:
@@ -84,23 +79,30 @@ class PlotsGAsVariables(object):
             data_slct = []
             for step, ptors in enumerate(self.struct):
                 for ptor in range(ptors):
+                    if ptor >= results.struct[step]:
+                        continue
                     data_slct.append(results.get_variable_and_level(step, ptor))
                     data_slct.append(results.get_criterion(step, ptor))
+                    data_slct.append(results.get_weight(step, ptor))
 
-            vals = [int(results.get_station()), results.get_valid_score()] + data_slct
+            vals = [int(results.get_station()), results.get_valid_score(), filename] + data_slct
             data.append(vals)
 
-        labels = ['station', 'score'] + labels_slct
+        labels = ['station', 'score', 'file'] + labels_slct
         self.data = pd.DataFrame(data, columns=labels)
+        self.data.sort_values(by=['station', 'file'], inplace=True)
 
     def __list_variables(self):
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
-                label = 'var_{}_{}'.format(step, ptor)
+                variables = self.data['var_{}_{}'.format(step, ptor)]
+                if self.filter_min_weight > 0:
+                    weight = self.data['weight_{}_{}'.format(step, ptor)]
+                    variables = variables[weight >= self.filter_min_weight]
                 if len(self.vars) == 0:
-                    self.vars = self.data[label]
+                    self.vars = variables
                 else:
-                    self.vars = self.vars.append(self.data[label])
+                    self.vars = self.vars.append(variables)
 
         self.vars = self.vars.drop_duplicates()
         self.vars = self.vars.sort_values(ascending=False)
@@ -127,7 +129,7 @@ class PlotsGAsVariables(object):
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
                 label = 'var_index_{}_{}'.format(step, ptor)
-                self.data[label] = -1
+                self.data[label] = None
                 for idx, var in enumerate(self.vars):
                     self.data.loc[self.data['var_{}_{}'.format(step, ptor)] == self.vars[idx], label] = idx
 
@@ -153,22 +155,39 @@ class PlotsGAsVariables(object):
             self.data.reset_index(drop=True, inplace=True)
 
     def __set_marker_size(self):
-        self.data['marker_size'] = 0
-        for station in self.stations:
-            indexes = self.data.loc[self.data['station'] == station].index
-            scores = self.data['score'].loc[indexes]
-            min_score = min(scores)
-            sizes = self.marker_size_max * ((min_score * (1 + self.marker_size_range)) - scores) / \
-                    (min_score * self.marker_size_range)
-            sizes[sizes < 1] = 1
-            self.data.loc[indexes, 'marker_size'] = sizes
+        if self.marker_size_on_weight:
+            max_weight = 0.2
+            min_weight = 0.02
+            for step, ptors in enumerate(self.struct):
+                for ptor in range(ptors):
+                    label = 'marker_size_{}_{}'.format(step, ptor)
+                    self.data[label] = None
+                    sizes = []
+                    for weight in self.data['weight_{}_{}'.format(step, ptor)]:
+                        size = self.marker_size_max * (weight - min_weight) / (max_weight - min_weight)
+                        if size < 1:
+                            size = 1
+                        if size > self.marker_size_max:
+                            size = self.marker_size_max
+                        sizes.append(size)
+                    self.data[label] = sizes
+        else:
+            self.data['marker_size'] = 0
+            for station in self.stations:
+                indexes = self.data.loc[self.data['station'] == station].index
+                scores = self.data['score'].loc[indexes]
+                min_score = min(scores)
+                sizes = self.marker_size_max * ((min_score * (1 + self.marker_size_range)) - scores) / \
+                        (min_score * self.marker_size_range)
+                sizes[sizes < 1] = 1
+                self.data.loc[indexes, 'marker_size'] = sizes
 
     def __make_plot(self):
         fig_height = 0.66 + float(len(self.vars)) * 3.7/25.0
         self.fig = plt.figure(figsize=(10, fig_height))
-        x = np.arange(1, len(self.data) + 1)
         plt.grid(axis='y', alpha=0.2)
         plt.xlim(0, len(self.data) + 1)
+        plt.ylim(-1, len(self.vars))
 
         do_paint = False
         xticks = []
@@ -184,8 +203,25 @@ class PlotsGAsVariables(object):
         for step, ptors in enumerate(self.struct):
             marker = self.markers[step]
             for ptor in range(ptors):
-                plt.scatter(x, self.data['var_index_{}_{}'.format(step, ptor)], marker=marker,
-                            c=self.data['crit_color_{}_{}'.format(step, ptor)], s=self.data['marker_size'],
+                x = np.arange(1, len(self.data) + 1)
+                variables = self.data['var_index_{}_{}'.format(step, ptor)]
+                facecolors = self.data['crit_color_{}_{}'.format(step, ptor)]
+                edgecolors = self.data['crit_color_{}_{}'.format(step, ptor)]
+                if self.marker_size_on_weight:
+                    sizes = self.data['marker_size_{}_{}'.format(step, ptor)]
+                    facecolors='none'
+                else:
+                    sizes = self.data['marker_size']
+
+                nodata = variables.isnull()
+                if nodata.any():
+                    indices = variables[nodata].index.tolist()
+                    variables = variables.drop(indices)
+                    edgecolors = edgecolors.drop(indices)
+                    sizes = sizes.drop(indices)
+                    x = np.delete(x, indices)
+
+                plt.scatter(x, variables, marker=marker, facecolors=facecolors, edgecolors=edgecolors, s=sizes,
                             alpha=self.marker_alpha, zorder=10)
         plt.xticks(xticks, self.stations)
         plt.yticks(self.vars.index.tolist(), self.vars)
