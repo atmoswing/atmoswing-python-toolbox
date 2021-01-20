@@ -165,7 +165,7 @@ class ParamsArray(object):
         elif 'pt/q' in var:
             var = 'PT/SH'
         elif 'pl/q' in var:
-            var = 'PL/SH'
+            var = 'SH'
         elif 'pt/mont' in var:
             var = 'PT/MONT'
         elif 'sff/strd' in var:
@@ -181,9 +181,9 @@ class ParamsArray(object):
         elif 'sff/ie' in var:
             var = 'IE'
         elif 'sfa/v10' in var:
-            var = 'V10'
+            var = 'V10m'
         elif 'sfa/u10' in var:
-            var = 'U10'
+            var = 'U10m'
         elif 'sfa/msl' in var:
             var = 'SLP'
         elif 'sfa/rh' in var:

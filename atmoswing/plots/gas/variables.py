@@ -20,35 +20,53 @@ class PlotsGAsVariables(object):
         self.marker_size_range = 0.05
         self.marker_size_on_weight = False
         self.filter_min_weight = 0.05
+        self.variables_importance_nb = 30
         self.marker_alpha = 1
         self.struct = []
         self.data = []
         self.vars = []
-        self.vars_default = ['PV950', 'Z600', 'Z700', 'Z800', 'Z850', 'Z900', 'Z950', 'Z1000', 'ZA1000', 'V700', 'V800',
-                             'VO900', 'W600', 'W700', 'W800', 'W850', 'W900', 'W950', 'W1000', 'D800', 'D850', 'D900',
-                             'T800', 'T850', 'T900', 'CWAT', 'SLP', 'STR', 'STRD', 'SSR', 'SSRD', 'CAPE']
+        self.vars_default = ['Z200', 'Z500', 'Z600', 'Z700', 'Z800', 'Z850', 'Z900', 'Z950', 'Z1000', 'ZA1000', 'PV/Z',
+                             'U200', 'U300', 'U400', 'U500', 'U600', 'U700', 'U800', 'U1000', 'U10m', 'PT/U285',
+                             'PT/U300', 'PT/U315', 'PT/U330', 'PT/U350', 'PT/U370', 'PT/U395', 'PV/U', 'V400', 'V500',
+                             'V600', 'V700', 'V800', 'V900', 'V950', 'V1000', 'V10m', 'PT/V285', 'PT/V315', 'PT/V330',
+                             'PT/V350', 'PT/V370', 'PT/V395', 'PV/V', 'PT/PRES285', 'PV/PRES', 'SLP', 'W200', 'W300',
+                             'W400', 'W500', 'W600', 'W700', 'W800', 'W850', 'W900', 'W950', 'W1000', 'D300', 'D400',
+                             'D800', 'D850', 'D900', 'D950', 'D1000', 'D2m', 'PT/D285', 'PT/D315', 'PT/D330', 'PT/D350',
+                             'PT/D370', 'VO300', 'VO500', 'VO600', 'VO700', 'VO900', 'PV300', 'PV400', 'PV600', 'PV700',
+                             'PV850', 'PV900', 'PV950', 'PT/PV285', 'PT/PV330', 'PT/PV350', 'PT/PV370', 'PT/PV395',
+                             'PT/MONT285', 'PT/MONT300', 'PT/MONT330', 'PT/MONT350', 'PT/MONT370', 'RH500', 'RH600',
+                             'RH700', 'RH800', 'RH850', 'RH900', 'RH950', 'RH1000', 'SH500', 'SH600', 'SH700',
+                             'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395', 'TCW', 'CWAT', 'IE', 'T400',
+                             'T600', 'T800', 'T850', 'T900', 'T950', 'T2m', 'PV/PT', 'SSR', 'SSRD', 'STR', 'STRD',
+                             'CAPE', 'SD']
         self.use_vars_default = True
         self.stations = []
         self.crit = ['RMSE', 'S0', 'S1', 'S2', 'MD', 'DSD', 'DMV']
         self.colors = plt.get_cmap('tab10').colors
         self.markers = ['o', 'v', 's', 'P', '^', '<', '>', '8', 'p', '*', 'h', 'H', 'D', 'd', 'X']
         self.files = glob.glob(base_dir + '/**/*best_individual.txt', recursive=True)
-        self.load()
 
-    def show(self):
+    def show_scatter(self):
         plt.ion()
         self.__set_criteria_color()
         self.__set_marker_size()
-        self.__make_plot()
+        self.__make_scatter_plot()
         plt.show()
 
-    def print(self, filename):
+    def print_scatter(self, filename):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
         self.__set_criteria_color()
         self.__set_marker_size()
-        self.__make_plot()
+        self.__make_scatter_plot()
+        self.__print(filename)
+
+    def print_variables_importance(self, filename):
+        if not self.output_path:
+            raise Exception('Output path not provided')
+        plt.ioff()
+        self.__make_variables_importance_plot()
         self.__print(filename)
 
     def load(self):
@@ -182,7 +200,7 @@ class PlotsGAsVariables(object):
                 sizes[sizes < 1] = 1
                 self.data.loc[indexes, 'marker_size'] = sizes
 
-    def __make_plot(self):
+    def __make_scatter_plot(self):
         fig_height = 0.66 + float(len(self.vars)) * 3.7/25.0
         self.fig = plt.figure(figsize=(10, fig_height))
         plt.grid(axis='y', alpha=0.2)
@@ -232,6 +250,55 @@ class PlotsGAsVariables(object):
         for idx, criteria in enumerate(self.crit):
             patches.append(mpatches.Patch(color=self.colors[idx], label=criteria, alpha=self.marker_alpha))
         plt.legend(handles=patches, title="Criteria", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), frameon=False)
+
+        self.fig.tight_layout()
+
+    def __make_variables_importance_plot(self):
+        fig_height = 0.66 + self.variables_importance_nb * 3.7/25.0
+        self.fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, fig_height))
+        ax2.grid(axis='y', alpha=0.2)
+        ax1.set_ylim(0, self.variables_importance_nb + 1)
+        ax2.set_ylim(0, self.variables_importance_nb + 1)
+
+        vars_weights = [[] for i in range(len(self.vars))]
+
+        for step, ptors in enumerate(self.struct):
+            for ptor in range(ptors):
+                variables = self.data['var_index_{}_{}'.format(step, ptor)]
+                weights = self.data['weight_{}_{}'.format(step, ptor)]
+
+                nodata = variables.isnull()
+                if nodata.any():
+                    indices = variables[nodata].index.tolist()
+                    variables = variables.drop(indices)
+                    weights = weights.drop(indices)
+
+                for i in range(len(variables)):
+                    vars_weights[variables.iloc[i]].append(weights.iloc[i])
+
+        sums = []
+        counts = []
+        for weights in vars_weights:
+            sums.append(np.sum(weights))
+            counts.append(len(weights))
+
+        counts, sums, vars_weights, vars = (list(t) for t in zip(*sorted(zip(counts, sums, vars_weights, self.vars.tolist()), reverse=True)))
+
+        y = range(1, self.variables_importance_nb + 1)
+
+        ax1.barh(y, counts[0:self.variables_importance_nb])
+        ax2.boxplot(vars_weights[0:self.variables_importance_nb], vert=False)
+
+        y_ticks = vars[0:self.variables_importance_nb]
+        ax1.set_yticks(y)
+        ax1.set_yticklabels(y_ticks)
+        ax1.invert_yaxis()
+        ax2.set_yticks(y)
+        ax2.set_yticklabels(y_ticks)
+        ax2.invert_yaxis()
+
+        ax1.set_xlabel('Number of selections')
+        ax2.set_xlabel('Weights')
 
         self.fig.tight_layout()
 
