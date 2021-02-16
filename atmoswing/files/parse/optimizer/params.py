@@ -240,9 +240,17 @@ class ParamsArray(object):
     def get_xmins(self, step, ptor):
         return self.data['xMin_{}_{}'.format(step, ptor)]
 
+    def get_xmin(self, step, ptor, index=0):
+        return self.data['xMin_{}_{}'.format(step, ptor)].iloc[index]
+
     def get_xmaxs(self, step, ptor):
         return self.data['xMin_{}_{}'.format(step, ptor)] + \
                (self.data['xPtsNb_{}_{}'.format(step, ptor)] - 1) * self.data['xStep_{}_{}'.format(step, ptor)]
+
+    def get_xmax(self, step, ptor, index=0):
+        return self.data['xMin_{}_{}'.format(step, ptor)].iloc[index] + \
+               (self.data['xPtsNb_{}_{}'.format(step, ptor)].iloc[index] - 1) * \
+               self.data['xStep_{}_{}'.format(step, ptor)].iloc[index]
 
     def get_xptsnbs(self, step, ptor):
         return self.data['xPtsNb_{}_{}'.format(step, ptor)]
@@ -250,9 +258,17 @@ class ParamsArray(object):
     def get_ymins(self, step, ptor):
         return self.data['yMin_{}_{}'.format(step, ptor)]
 
+    def get_ymin(self, step, ptor, index=0):
+        return self.data['yMin_{}_{}'.format(step, ptor)].iloc[index]
+
     def get_ymaxs(self, step, ptor):
         return self.data['yMin_{}_{}'.format(step, ptor)] + \
                (self.data['yPtsNb_{}_{}'.format(step, ptor)] - 1) * self.data['yStep_{}_{}'.format(step, ptor)]
+
+    def get_ymax(self, step, ptor, index=0):
+        return self.data['yMin_{}_{}'.format(step, ptor)].iloc[index] + \
+               (self.data['yPtsNb_{}_{}'.format(step, ptor)].iloc[index] - 1) * \
+               self.data['yStep_{}_{}'.format(step, ptor)].iloc[index]
 
     def get_yptsnbs(self, step, ptor):
         return self.data['yPtsNb_{}_{}'.format(step, ptor)]

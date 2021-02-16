@@ -4,9 +4,11 @@ import os
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 import numpy as np
 import pandas as pd
 from atmoswing.files.parse.optimizer import params
+from collections import Counter
 
 
 class PlotsGAsVariables(object):
@@ -62,11 +64,12 @@ class PlotsGAsVariables(object):
         self.__make_scatter_plot()
         self.__print(filename)
 
-    def print_variables_importance(self, filename):
+    def print_syntheses(self, filename):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self.__make_variables_importance_plot()
+        self.__set_criteria_color()
+        self.__make_syntheses_plot()
         self.__print(filename)
 
     def load(self):
@@ -89,6 +92,11 @@ class PlotsGAsVariables(object):
                 labels_slct.append('var_{}_{}'.format(step, ptor))
                 labels_slct.append('criterion_{}_{}'.format(step, ptor))
                 labels_slct.append('weight_{}_{}'.format(step, ptor))
+                labels_slct.append('time_{}_{}'.format(step, ptor))
+                labels_slct.append('x_min_{}_{}'.format(step, ptor))
+                labels_slct.append('x_max_{}_{}'.format(step, ptor))
+                labels_slct.append('y_min_{}_{}'.format(step, ptor))
+                labels_slct.append('y_max_{}_{}'.format(step, ptor))
 
         # Extract values
         for filename in self.files:
@@ -102,6 +110,11 @@ class PlotsGAsVariables(object):
                     data_slct.append(results.get_variable_and_level(step, ptor))
                     data_slct.append(results.get_criterion(step, ptor))
                     data_slct.append(results.get_weight(step, ptor))
+                    data_slct.append(results.get_time(step, ptor))
+                    data_slct.append(results.get_xmin(step, ptor))
+                    data_slct.append(results.get_xmax(step, ptor))
+                    data_slct.append(results.get_ymin(step, ptor))
+                    data_slct.append(results.get_ymax(step, ptor))
 
             vals = [int(results.get_station()), results.get_valid_score(), filename] + data_slct
             data.append(vals)
@@ -253,28 +266,55 @@ class PlotsGAsVariables(object):
 
         self.fig.tight_layout()
 
-    def __make_variables_importance_plot(self):
-        fig_height = 0.66 + self.variables_importance_nb * 3.7/25.0
-        self.fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, fig_height))
-        ax2.grid(axis='y', alpha=0.2)
-        ax1.set_ylim(0, self.variables_importance_nb + 1)
-        ax2.set_ylim(0, self.variables_importance_nb + 1)
+    def __make_syntheses_plot(self):
+        fig_height = 2 + 2 * self.variables_importance_nb * 3.7/25.0
+        self.fig, axs = plt.subplots(2, 2, figsize=(10, fig_height))
+        axs[0, 1].grid(axis='y', alpha=0.2)
+        axs[1, 1].grid(axis='y', alpha=0.2)
+        axs[0, 0].set_ylim(0, self.variables_importance_nb + 1)
+        axs[0, 1].set_ylim(0, self.variables_importance_nb + 1)
+        axs[1, 0].set_ylim(0, self.variables_importance_nb + 1)
+        axs[1, 1].set_ylim(0, self.variables_importance_nb + 1)
 
         vars_weights = [[] for i in range(len(self.vars))]
+        vars_colors = [[] for i in range(len(self.vars))]
+        vars_times = [[] for i in range(len(self.vars))]
+        vars_xmins = [[] for i in range(len(self.vars))]
+        vars_xmaxs = [[] for i in range(len(self.vars))]
+        vars_ymins = [[] for i in range(len(self.vars))]
+        vars_ymaxs = [[] for i in range(len(self.vars))]
 
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
                 variables = self.data['var_index_{}_{}'.format(step, ptor)]
                 weights = self.data['weight_{}_{}'.format(step, ptor)]
+                crit_color = self.data['crit_color_{}_{}'.format(step, ptor)]
+                times = self.data['time_{}_{}'.format(step, ptor)]
+                xmins = self.data['x_min_{}_{}'.format(step, ptor)]
+                xmaxs = self.data['x_max_{}_{}'.format(step, ptor)]
+                ymins = self.data['y_min_{}_{}'.format(step, ptor)]
+                ymaxs = self.data['y_max_{}_{}'.format(step, ptor)]
 
                 nodata = variables.isnull()
                 if nodata.any():
                     indices = variables[nodata].index.tolist()
                     variables = variables.drop(indices)
                     weights = weights.drop(indices)
+                    crit_color = crit_color.drop(indices)
+                    times = times.drop(indices)
+                    xmins = xmins.drop(indices)
+                    xmaxs = xmaxs.drop(indices)
+                    ymins = ymins.drop(indices)
+                    ymaxs = ymaxs.drop(indices)
 
                 for i in range(len(variables)):
                     vars_weights[variables.iloc[i]].append(weights.iloc[i])
+                    vars_colors[variables.iloc[i]].append(crit_color.iloc[i])
+                    vars_times[variables.iloc[i]].append(times.iloc[i])
+                    vars_xmins[variables.iloc[i]].append(xmins.iloc[i])
+                    vars_xmaxs[variables.iloc[i]].append(xmaxs.iloc[i])
+                    vars_ymins[variables.iloc[i]].append(ymins.iloc[i])
+                    vars_ymaxs[variables.iloc[i]].append(ymaxs.iloc[i])
 
         sums = []
         counts = []
@@ -282,23 +322,130 @@ class PlotsGAsVariables(object):
             sums.append(np.sum(weights))
             counts.append(len(weights))
 
-        counts, sums, vars_weights, vars = (list(t) for t in zip(*sorted(zip(counts, sums, vars_weights, self.vars.tolist()), reverse=True)))
+        counts, sums, vars_weights, vars_colors, vars_times, vars_xmins, vars_xmaxs, vars_ymins, vars_ymaxs, vars = \
+            (list(t) for t in zip(*sorted(zip(counts, sums, vars_weights, vars_colors, vars_times, vars_xmins,
+                                              vars_xmaxs, vars_ymins, vars_ymaxs, self.vars.tolist()),
+                                          reverse=True)))
 
         y = range(1, self.variables_importance_nb + 1)
 
-        ax1.barh(y, counts[0:self.variables_importance_nb])
-        ax2.boxplot(vars_weights[0:self.variables_importance_nb], vert=False)
+        # Longitude / longitude colors
+        color1 = 'tab:blue'
+        color2 = 'tab:brown'
+        flierprops1 = dict(marker='.', markeredgecolor=color1)
+        flierprops2 = dict(marker='.', markeredgecolor=color2)
+
+        # Print variables with criteria (color)
+        count_colors = [[] for i in range(self.variables_importance_nb)]
+        for i in range(self.variables_importance_nb):
+            colors = vars_colors[i]
+            count_col = Counter(colors)
+            count_col = sorted(count_col.items(), key=lambda item: item[1], reverse=True)
+            count_colors[i] = count_col
+
+        # Simple version: ax1.barh(y, counts[0:self.variables_importance_nb])
+        for i in range(self.variables_importance_nb):
+            x_start = 0
+            for count_col in count_colors[i]:
+                x_width = count_col[1]
+                color = count_col[0]
+                axs[0, 0].barh(i+1, x_width, left=x_start, color=color)
+                x_start += x_width
+
+        patches = []
+        for idx, criteria in enumerate(self.crit):
+            patches.append(mpatches.Patch(color=self.colors[idx], label=criteria))
+        axs[0, 0].legend(handles=patches, title="Criteria", loc="lower right", frameon=False)
+
+        # Print weights
+        #axs[0, 1].boxplot(vars_weights[0:self.variables_importance_nb], vert=False)
+
+        # Print longitude
+        axs[0, 1].axvspan(6, 10.5, facecolor='gray', alpha=0.3)
+        box1 = axs[0, 1].boxplot(vars_xmins[0:self.variables_importance_nb], vert=False, flierprops=flierprops1)
+        box2 = axs[0, 1].boxplot(vars_xmaxs[0:self.variables_importance_nb], vert=False, flierprops=flierprops2)
+        for element, line_list in box1.items():
+            if element == 'medians':
+                continue
+            for line in line_list:
+                line.set_color(color1)
+        for element, line_list in box2.items():
+            if element == 'medians':
+                continue
+            for line in line_list:
+                line.set_color(color2)
+
+        # Print time
+        count_times = [[] for i in range(self.variables_importance_nb)]
+        h_min = 99
+        h_max = 0
+        for i in range(self.variables_importance_nb):
+            times = vars_times[i]
+            count_time = Counter(times)
+            count_time = sorted(count_time.items(), key=lambda item: item[0])
+            count_time_sum = np.sum(count_time, axis=0)
+            count_time = [(x[0], 100 * x[1] / count_time_sum[1]) for x in count_time]
+            count_times[i] = count_time
+            h_min = min(float(np.min(count_time, axis=0)[0]), h_min)
+            h_max = max(float(np.max(count_time, axis=0)[0]), h_max)
+
+        cmap = plt.get_cmap('viridis')
+        for i in range(self.variables_importance_nb):
+            x_start = 0
+            for count_time in count_times[i]:
+                x_width = count_time[1]
+                time = count_time[0]
+                color = cmap((time - h_min) / (h_max - h_min))
+                axs[1, 0].barh(i+1, x_width, left=x_start, color=color)
+                x_start += x_width
+
+        patches = []
+        for hr in range(int(h_min), int(h_max) + 6, 6):
+            patches.append(mpatches.Patch(color=cmap((hr - h_min) / (h_max - h_min)), label='{}'.format(hr)))
+        axs[1, 0].legend(handles=patches, bbox_to_anchor=(1, -0.2), #title="Time"
+                         ncol=int(1 + (h_max - h_min) / 6), loc='lower right', frameon=False)
+
+        # Print latitudes
+        axs[1, 1].axvspan(45.8, 47.8, facecolor='gray', alpha=0.3)
+        box1 = axs[1, 1].boxplot(vars_ymins[0:self.variables_importance_nb], vert=False, flierprops=flierprops1)
+        box2 = axs[1, 1].boxplot(vars_ymaxs[0:self.variables_importance_nb], vert=False, flierprops=flierprops2)
+        for element, line_list in box1.items():
+            if element == 'medians':
+                continue
+            for line in line_list:
+                line.set_color(color1)
+        for element, line_list in box2.items():
+            if element == 'medians':
+                continue
+            for line in line_list:
+                line.set_color(color2)
+
+        min_line = mlines.Line2D([], [], color=color1, label='min')
+        max_line = mlines.Line2D([], [], color=color2, label='max')
+        switzerland = mpatches.Patch(color='gray', alpha=0.3, label='Switzerland')
+        patches.append(mpatches.Patch(color1, label='min'))
+        patches.append(mpatches.Patch(color2, label='max'))
+        axs[1, 1].legend(handles=[min_line, max_line, switzerland], bbox_to_anchor=(0.5, -0.2),
+                         ncol=3, loc='lower center', frameon=False)
 
         y_ticks = vars[0:self.variables_importance_nb]
-        ax1.set_yticks(y)
-        ax1.set_yticklabels(y_ticks)
-        ax1.invert_yaxis()
-        ax2.set_yticks(y)
-        ax2.set_yticklabels(y_ticks)
-        ax2.invert_yaxis()
+        axs[0, 0].set_yticks(y)
+        axs[0, 0].set_yticklabels(y_ticks)
+        axs[0, 0].invert_yaxis()
+        axs[0, 1].set_yticks(y)
+        axs[0, 1].set_yticklabels(y_ticks)
+        axs[0, 1].invert_yaxis()
+        axs[1, 0].set_yticks(y)
+        axs[1, 0].set_yticklabels(y_ticks)
+        axs[1, 0].invert_yaxis()
+        axs[1, 1].set_yticks(y)
+        axs[1, 1].set_yticklabels(y_ticks)
+        axs[1, 1].invert_yaxis()
 
-        ax1.set_xlabel('Number of selections')
-        ax2.set_xlabel('Weights')
+        axs[0, 0].set_xlabel('Number of selections')
+        axs[0, 1].set_xlabel('Longitude min/max')
+        axs[1, 0].set_xlabel('Percentage of selected hours (%)')
+        axs[1, 1].set_xlabel('Latitude min/max')
 
         self.fig.tight_layout()
 
