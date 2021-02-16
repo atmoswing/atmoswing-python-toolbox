@@ -6,10 +6,10 @@ import dateutil.parser
 import numpy as np
 from netCDF4 import Dataset
 from atmoswing.external import jdcal
-from atmoswing.files.parse.predictors.dataset import Dataset
+from atmoswing.files.parse.predictors.dataset import Dataset as ds
 
 
-class NetCDF(Dataset):
+class NetCDF(ds):
     """Extract NetCDF data"""
 
     def __init__(self, directory, file_pattern, var_name):
