@@ -43,6 +43,7 @@ for file in files_list:
 
     reanalysis = netcdf_dataset.NetCDF(directory=dir_origin_files, file_pattern=file[1] + '.*.nc', var_name=var_name_origin)
     reanalysis.load(spatial_stride=2)  # reduce resolution to 0.5°
+    reanalysis.replace_nans(-32767, 0.0000001)  # use very small value to avoid division by 0.
     new_reanalysis = generic.Generic(directory=dir_target_files, var_name=var_name_target, ref_data=reanalysis)
     new_reanalysis.generate()
 
