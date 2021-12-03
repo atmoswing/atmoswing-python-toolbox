@@ -3,7 +3,7 @@
 import os
 from atmoswing.plots.gas import variables
 
-base_dir = 'D:\\Projects_Unibe\\2020 Analogs IVS\\Analyses\\3 - GAs optim all catchments\\results\\1*/'
+base_dir = 'D:\\_Unibe\\2020 Analogs IVS\\Analyses\\4 - GAs optim ERA5\\results\\2*/'
 output_path = base_dir + '\\..\\'
 
 res = variables.PlotsGAsVariables(base_dir, output_path)
@@ -13,4 +13,4 @@ res.marker_alpha = 0.8
 res.load()
 
 res.print_scatter('fig-1x')
-res.print_variables_importance('fig-1x-importance')
+res.print_syntheses('fig-1x-importance')

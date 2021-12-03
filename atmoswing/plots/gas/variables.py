@@ -39,8 +39,8 @@ class PlotsGAsVariables(object):
                              'PT/MONT285', 'PT/MONT300', 'PT/MONT330', 'PT/MONT350', 'PT/MONT370', 'RH500', 'RH600',
                              'RH700', 'RH800', 'RH850', 'RH900', 'RH950', 'RH1000', 'SH500', 'SH600', 'SH700',
                              'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395', 'TCW', 'CWAT', 'IE', 'T400',
-                             'T600', 'T800', 'T850', 'T900', 'T950', 'T2m', 'PV/PT', 'SSR', 'SSRD', 'STR', 'STRD',
-                             'CAPE', 'SD']
+                             'T600', 'T800', 'T850', 'T900', 'T950', 'T2m', 'PV/PT', 'DEG0L', 'SSR', 'SSRD', 'STR',
+                             'STRD', 'SLHF', 'SSHF', 'TSR', 'TTR', 'CAPE', 'CC', 'LCC', 'SD']
         self.use_vars_default = True
         self.stations = []
         self.crit = ['RMSE', 'S0', 'S1', 'S2', 'MD', 'DSD', 'DMV']

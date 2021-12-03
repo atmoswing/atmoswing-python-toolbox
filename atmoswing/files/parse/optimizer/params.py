@@ -133,6 +133,17 @@ class ParamsArray(object):
 
     def get_variable(self, step, ptor, index=0):
         var = str(self.data['Variable_{}_{}'.format(step, ptor)].iloc[index])
+        # Map levels
+        if 'pressure/' in var:
+            var = var.replace('pressure/', 'pl/')
+        if 'press/' in var:
+            var = var.replace('press/', 'pl/')
+        if 'sff/' in var:
+            var = var.replace('sff/', 'surf/')
+        if 'sfa/' in var:
+            var = var.replace('sfa/', 'surf/')
+
+        # Rename variables
         if 'hgt' in var:
             var = 'Z'
         elif 'pl/z' in var:
@@ -155,7 +166,7 @@ class ParamsArray(object):
             var = 'U'
         elif 'pl/depr' in var:  # Dew-point depression (JRA55)
             var = 'DEPR'
-        elif 'sfa/depr' in var:  # Dew-point depression (JRA55)
+        elif 'surf/depr' in var:  # Dew-point depression (JRA55)
             var = 'DEPR'
         elif 'pl/reld' in var:  # Relative divergence (JRA55)
             var = 'RD'
@@ -195,42 +206,66 @@ class ParamsArray(object):
             var = 'SH'
         elif 'pt/mont' in var:
             var = 'PT/MONT'
-        elif 'sff/strd' in var:
+        elif 'surf/strd' in var:
             var = 'STRD'
-        elif 'sff/str' in var:
+        elif 'single/strd' in var:
+            var = 'STRD'
+        elif 'surf/str' in var:
             var = 'STR'
-        elif 'sff/ssrd' in var:
+        elif 'single/str' in var:
+            var = 'STR'
+        elif 'surf/ssrd' in var:
             var = 'SSRD'
-        elif 'sff/ssr' in var:
+        elif 'single/ssrd' in var:
+            var = 'SSRD'
+        elif 'surf/ssr' in var:
             var = 'SSR'
-        elif 'sff/cape' in var:
+        elif 'single/ssr' in var:
+            var = 'SSR'
+        elif 'surf/cape' in var:
             var = 'CAPE'
-        elif 'sff/ie' in var:
+        elif 'single/cape' in var:
+            var = 'CAPE'
+        elif 'surf/ie' in var:
             var = 'IE'
-        elif 'sfa/v10' in var:
+        elif 'surf/v10' in var:
             var = 'V10m'
-        elif 'sfa/u10' in var:
+        elif 'single/v10' in var:
+            var = 'V10m'
+        elif 'surf/u10' in var:
             var = 'U10m'
-        elif 'sfa/msl' in var:
+        elif 'surf/msl' in var:
             var = 'SLP'
-        elif 'sfa/rh' in var:
+        elif 'surf/rh' in var:
             var = 'RH'
-        elif 'press/rh' in var:
-            var = 'RH'
-        elif 'press/t' in var:
-            var = 'T'
-        elif 'sfa/t2m' in var:
+        elif 'surf/t2m' in var:
             var = 'T2m'
-        elif 'sfa/sst' in var:
+        elif 'single/t2m' in var:
+            var = 'T2m'
+        elif 'surf/sst' in var:
             var = 'SST'
-        elif 'sfa/d2m' in var:
+        elif 'surf/d2m' in var:
             var = 'D2m'
-        elif 'sfa/sd' in var:
+        elif 'surf/sd' in var:
             var = 'SD'
-        elif 'sfa/prmsl' in var:
+        elif 'surf/prmsl' in var:
             var = 'SLP'
+        elif 'single/tsr' in var:
+            var = 'TSR'
+        elif 'single/ttr' in var:
+            var = 'TTR'
+        elif 'single/sshf' in var:
+            var = 'SSHF'
+        elif 'single/slhf' in var:
+            var = 'SLHF'
         elif 'msl/pres' in var:
             var = 'SLP'
+        elif 'single/lcc' in var:
+            var = 'LCC'
+        elif 'pl/cc' in var:
+            var = 'CC'
+        elif 'single/deg0l' in var:
+            var = 'DEG0L'
         elif 'plf/cwat' in var:
             var = 'CWAT'
         elif 'ea/cwat' in var:
