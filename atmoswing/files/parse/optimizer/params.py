@@ -18,6 +18,11 @@ class ParamsArray(object):
         self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
         self.__remove_failed()
 
+    def load_scores_only(self):
+        file_struct = self.__parse_headers_scores_only()
+        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
+        self.__remove_failed()
+
     def __parse_headers(self):
         fid = open(self.path, "r")
         fid.readline()
@@ -76,6 +81,28 @@ class ParamsArray(object):
                 label = '{}_{}_{}'.format(chars, step, ptor)
                 headers.append(label)
                 cols.append(idx + 1)
+
+        fid.close()
+
+        return [cols, headers]
+
+    def __parse_headers_scores_only(self):
+        fid = open(self.path, "r")
+        fid.readline()
+        line = fid.readline().split('\t')
+        self.id = line[1]
+
+        headers = []
+        cols = []
+        for idx, chars in enumerate(line):
+            if chars == 'Calib':
+                headers.append(chars)
+                cols.append(idx + 1)
+            elif chars == 'Valid':
+                headers.append(chars)
+                cols.append(idx + 1)
+            elif "Score" in chars:
+                self.score = line[idx + 1]
 
         fid.close()
 
