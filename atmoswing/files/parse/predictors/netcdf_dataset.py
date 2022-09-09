@@ -7,6 +7,7 @@ import numpy as np
 from netCDF4 import Dataset
 from atmoswing.external import jdcal
 from atmoswing.files.parse.predictors.dataset import Dataset as ds
+from atmoswing.files.create.predictors import generic
 
 
 class NetCDF(ds):
@@ -19,6 +20,14 @@ class NetCDF(ds):
     def load(self, spatial_stride=0):
         self.__list()
         self.__extract(spatial_stride)
+
+    def create_generic_individual_files(self, directory, var_name, spatial_stride=0):
+        self.__list()
+        for file in self.__files:
+            self.__extract_file(file, spatial_stride)
+            new_reanalysis = generic.Generic(directory=directory, var_name=var_name, ref_data=self)
+            new_reanalysis.generate(file_name=os.path.basename(file))
+            self.__drop_data()
 
     def __list(self):
         if not os.path.isdir(self.directory):
@@ -33,54 +42,65 @@ class NetCDF(ds):
 
     def __extract(self, spatial_stride=0):
         for file in self.__files:
-            if not os.path.isfile(file):
-                raise Exception('File {} not found'.format(file))
+            self.__extract_file(file, spatial_stride)
 
-            print('Reading ' + file)
-            nc = Dataset(file, 'r')
-            var = nc.variables[self.var_name]
+    def __extract_file(self, file, spatial_stride=0):
+        if not os.path.isfile(file):
+            raise Exception('File {} not found'.format(file))
 
-            has_levels = len(var.dimensions) == 4
+        print('Reading ' + file)
+        nc = Dataset(file, 'r')
+        var = nc.variables[self.var_name]
 
-            if spatial_stride > 1:
-                if has_levels:
-                    dat = nc.variables[self.var_name][:, :, 0::spatial_stride, 0::spatial_stride]
-                else:
-                    dat = nc.variables[self.var_name][:, 0::spatial_stride, 0::spatial_stride]
-                data = np.array(dat)
+        has_levels = len(var.dimensions) == 4
+
+        if spatial_stride > 1:
+            if has_levels:
+                dat = nc.variables[self.var_name][:, :, 0::spatial_stride, 0::spatial_stride]
             else:
-                data = np.array(var)
+                dat = nc.variables[self.var_name][:, 0::spatial_stride, 0::spatial_stride]
+            data = np.array(dat)
+        else:
+            data = np.array(var)
 
-            time = np.array(nc.variables[var.dimensions[0]])
-            time = self.__convert_time(nc, var, time)
+        time = np.array(nc.variables[var.dimensions[0]])
+        time = self.__convert_time(nc, var, time)
 
-            if not has_levels:
-                new_shape = (data.shape[0], 1, data.shape[1], data.shape[2])
-                data = np.reshape(data, new_shape)
+        if not has_levels:
+            new_shape = (data.shape[0], 1, data.shape[1], data.shape[2])
+            data = np.reshape(data, new_shape)
 
-            if len(self.data) == 0:
-                self.data = data
-                self.data_units = nc.variables[self.var_name].units
-                self.axis_time = time
-                if has_levels:
-                    self.axis_level = np.array(nc.variables[var.dimensions[1]])
-                    self.axis_lat = np.array(nc.variables[var.dimensions[2]])
-                    self.axis_lon = np.array(nc.variables[var.dimensions[3]])
-                    if spatial_stride > 1:
-                        self.axis_lat = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
-                        self.axis_lon = np.array(nc.variables[var.dimensions[3]][0::spatial_stride])
-                else:
-                    self.axis_level = [0]
-                    self.axis_lat = np.array(nc.variables[var.dimensions[1]])
-                    self.axis_lon = np.array(nc.variables[var.dimensions[2]])
-                    if spatial_stride > 1:
-                        self.axis_lat = np.array(nc.variables[var.dimensions[1]][0::spatial_stride])
-                        self.axis_lon = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
+        if len(self.data) == 0:
+            self.data = data
+            self.data_units = nc.variables[self.var_name].units
+            self.axis_time = time
+            if has_levels:
+                self.axis_level = np.array(nc.variables[var.dimensions[1]])
+                self.axis_lat = np.array(nc.variables[var.dimensions[2]])
+                self.axis_lon = np.array(nc.variables[var.dimensions[3]])
+                if spatial_stride > 1:
+                    self.axis_lat = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
+                    self.axis_lon = np.array(nc.variables[var.dimensions[3]][0::spatial_stride])
             else:
-                self.data = np.append(self.data, data, axis=0)
-                self.axis_time = np.append(self.axis_time, time, axis=0)
+                self.axis_level = [0]
+                self.axis_lat = np.array(nc.variables[var.dimensions[1]])
+                self.axis_lon = np.array(nc.variables[var.dimensions[2]])
+                if spatial_stride > 1:
+                    self.axis_lat = np.array(nc.variables[var.dimensions[1]][0::spatial_stride])
+                    self.axis_lon = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
+        else:
+            self.data = np.append(self.data, data, axis=0)
+            self.axis_time = np.append(self.axis_time, time, axis=0)
 
-            nc.close()
+        nc.close()
+
+    def __drop_data(self):
+        self.data = []
+        self.data_units = []
+        self.axis_time = []
+        self.axis_level = []
+        self.axis_lat = []
+        self.axis_lon = []
 
     def __convert_time(self, nc, var, time):
         time_units = nc.variables[var.dimensions[0]].units

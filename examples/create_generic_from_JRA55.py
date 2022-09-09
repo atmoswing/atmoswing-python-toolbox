@@ -4,6 +4,9 @@ import os
 from atmoswing.files.parse.predictors import netcdf_dataset
 from atmoswing.files.create.predictors import generic
 
+dir_origin = 'path/to/data'
+dir_target = 'path/to/outputs'
+
 files_list = [['anl_column125', 'anl_column125.054_pwat.*', 'PWAT_GDS0_EATM', 'pwat'],
               ['anl_column125', 'anl_column125.152_vwv.*', 'VWV_GDS0_EATM', 'vwv'],
               ['anl_column125', 'anl_column125.157_uwv.*', 'UWV_GDS0_EATM', 'uwv'],
@@ -58,8 +61,6 @@ files_list = [['anl_column125', 'anl_column125.054_pwat.*', 'PWAT_GDS0_EATM', 'p
               ['fcst_land125', 'fcst_land125.225_soilw.*', 'SoilW_GDS0_ULN', 'soilw'],
               ['fcst_p125', 'fcst_p125.221_cwat.*', 'CWAT_GDS0_ISBL', 'cwat'],
               ['fcst_p125', 'fcst_p125.228_clwc.*', 'CLWC_GDS0_ISBL', 'clwc']]
-dir_origin = 'F:\\Reanalyses\\JRA-55-sub-more-vars\\'
-dir_target = 'F:\\Reanalyses\\JRA-55-sub-more-vars-generic'
 
 
 for file in files_list:

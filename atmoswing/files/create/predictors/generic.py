@@ -8,6 +8,7 @@ NETCDF_3 = 0
 NETCDF_4 = 1
 """ NetCDF 4 format - smaller but longer to read """
 
+
 class Generic(object):
     """Generic predictors dataset"""
 
@@ -18,10 +19,11 @@ class Generic(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    def generate(self, format=NETCDF_3):
+    def generate(self, format=NETCDF_3, file_name=None):
         shape = self.ref_data.data.shape  # time, level, lat, lon
 
-        file_name = self.var_name + '.nc'
+        if file_name is None:
+            file_name = self.var_name + '.nc'
         file_path = os.path.join(self.directory, file_name)
         if format == NETCDF_3:
             nc = Dataset(file_path, "w", format="NETCDF3_CLASSIC")

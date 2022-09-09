@@ -6,8 +6,8 @@ from atmoswing.files.parse.predictors import dataset
 from atmoswing.files.parse.predictors import grib_dataset
 from atmoswing.files.create.predictors import generic
 
-dir_origin = '/media/sf_FVG-predictors-mesoscale'
-dir_target = '/media/sf_FVG-predictors-mesoscale/_new'
+dir_origin = 'path/to/data'
+dir_target = 'path/to/outputs'
 
 files_list = [['data', '10u_sfc_*.grib', '10u_sfc'],
               ['data', 'cp_sfc_*.grib', 'cp_sfc'],

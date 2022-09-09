@@ -4,8 +4,8 @@ import os
 from atmoswing.files.parse.predictors import netcdf_dataset
 from atmoswing.files.create.predictors import generic
 
-dir_origin = '...'
-dir_target = '...'
+dir_origin = 'path/to/data'
+dir_target = 'path/to/outputs'
 
 files_list = [['pressure', 'cc', 'cc'],
               ['pressure', 'd', 'd'],
