@@ -33,16 +33,19 @@ class PlotsGAsVariables(object):
                              'V600', 'V700', 'V800', 'V900', 'V950', 'V1000', 'V10m', 'PT/V285', 'PT/V315', 'PT/V330',
                              'PT/V350', 'PT/V370', 'PT/V395', 'PV/V', 'PT/PRES285', 'PV/PRES', 'SLP', 'W200', 'W300',
                              'W400', 'W500', 'W600', 'W700', 'W800', 'W850', 'W900', 'W950', 'W1000', 'D300', 'D400',
-                             'D800', 'D850', 'D900', 'D950', 'D1000', 'D2m', 'PT/D285', 'PT/D315', 'PT/D330', 'PT/D350',
-                             'PT/D370', 'VO300', 'VO500', 'VO600', 'VO700', 'VO900', 'PV300', 'PV400', 'PV600', 'PV700',
-                             'PV850', 'PV900', 'PV950', 'PT/PV285', 'PT/PV330', 'PT/PV350', 'PT/PV370', 'PT/PV395',
-                             'PT/MONT285', 'PT/MONT300', 'PT/MONT330', 'PT/MONT350', 'PT/MONT370', 'RH500', 'RH600',
-                             'RH700', 'RH800', 'RH850', 'RH900', 'RH950', 'RH1000', 'SH500', 'SH600', 'SH700',
-                             'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395', 'TCW', 'CWAT', 'IE', 'T400',
-                             'T600', 'T800', 'T850', 'T900', 'T950', 'T2m', 'PV/PT', 'DEG0L', 'SSR', 'SSRD', 'STR',
-                             'STRD', 'SLHF', 'SSHF', 'TSR', 'TTR', 'CAPE', 'CC', 'LCC', 'SD']
+                             'D600', 'D800', 'D850', 'D900', 'D950', 'D1000', 'D2m', 'PT/D285', 'PT/D315', 'PT/D330',
+                             'PT/D350', 'PT/D370', 'VO300', 'VO500', 'VO600', 'VO700', 'VO900', 'PV300', 'PV400',
+                             'PV500', 'PV600', 'PV700', 'PV800', 'PV850', 'PV900', 'PV950', 'PV1000', 'PT/PV285',
+                             'PT/PV330', 'PT/PV350', 'PT/PV370', 'PT/PV395', 'PT/MONT285', 'PT/MONT300', 'PT/MONT330',
+                             'PT/MONT350', 'PT/MONT370', 'RH500', 'RH600', 'RH700', 'RH800', 'RH850', 'RH900', 'RH950',
+                             'RH1000', 'MI500', 'MI600', 'MI700', 'MI800', 'MI850', 'MI900', 'MI950', 'MI1000', 'SH500',
+                             'SH600', 'SH700', 'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395', 'TCW',
+                             'CWAT', 'IE', 'T400', 'T500', 'T600', 'T700', 'T800', 'T850', 'T900', 'T950', 'T2m',
+                             'PV/PT', 'DEG0L', 'SSR', 'SSRD', 'STR', 'STRD', 'SLHF', 'SSHF', 'TSR', 'TTR', 'CAPE',
+                             'TCC', 'CC500', 'CC600', 'CC700', 'CC800', 'CC850', 'CC1000', 'LCC', 'SD']
         self.use_vars_default = True
         self.stations = []
+        self.time_step = 6
         self.crit = ['RMSE', 'S0', 'S1', 'S2', 'MD', 'DSD', 'DMV']
         self.colors = plt.get_cmap('tab10').colors
         self.markers = ['o', 'v', 's', 'P', '^', '<', '>', '8', 'p', '*', 'h', 'H', 'D', 'd', 'X']
@@ -133,7 +136,7 @@ class PlotsGAsVariables(object):
                 if len(self.vars) == 0:
                     self.vars = variables
                 else:
-                    self.vars = self.vars.append(variables)
+                    self.vars = pd.concat([self.vars, variables])
 
         self.vars = self.vars.drop_duplicates()
         self.vars = self.vars.sort_values(ascending=False)
@@ -149,6 +152,9 @@ class PlotsGAsVariables(object):
             new_vars.reverse()
             self.vars = pd.Series(new_vars)
         self.vars = self.vars.reset_index(drop=True)
+
+        if len(self.vars) < self.variables_importance_nb:
+            self.variables_importance_nb = len(self.vars)
 
     def __list_stations(self):
         self.stations = self.data['station']
@@ -188,7 +194,7 @@ class PlotsGAsVariables(object):
     def __set_marker_size(self):
         if self.marker_size_on_weight:
             max_weight = 0.2
-            min_weight = 0.02
+            min_weight = 0.01
             for step, ptors in enumerate(self.struct):
                 for ptor in range(ptors):
                     label = 'marker_size_{}_{}'.format(step, ptor)
@@ -196,9 +202,11 @@ class PlotsGAsVariables(object):
                     sizes = []
                     for weight in self.data['weight_{}_{}'.format(step, ptor)]:
                         size = self.marker_size_max * (weight - min_weight) / (max_weight - min_weight)
-                        if size < 1:
+                        if weight == 0:
+                            size = 0
+                        elif size < 1:
                             size = 1
-                        if size > self.marker_size_max:
+                        elif size > self.marker_size_max:
                             size = self.marker_size_max
                         sizes.append(size)
                     self.data[label] = sizes
@@ -400,10 +408,10 @@ class PlotsGAsVariables(object):
                 x_start += x_width
 
         patches = []
-        for hr in range(int(h_min), int(h_max) + 6, 6):
+        for hr in range(int(h_min), int(h_max) + self.time_step, self.time_step):
             patches.append(mpatches.Patch(color=cmap((hr - h_min) / (h_max - h_min)), label='{}'.format(hr)))
         axs[1, 0].legend(handles=patches, bbox_to_anchor=(1, -0.2), #title="Time"
-                         ncol=int(1 + (h_max - h_min) / 6), loc='lower right', frameon=False)
+                         ncol=5, loc='lower right', frameon=False)
 
         # Print latitudes
         axs[1, 1].axvspan(45.8, 47.8, facecolor='gray', alpha=0.3)

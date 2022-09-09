@@ -15,6 +15,11 @@ class ParamsArray(object):
 
     def load(self):
         file_struct = self.__parse_headers()
+        # Check for duplicates
+        seen = set()
+        dupes = [x for x in file_struct[1] if x in seen or seen.add(x)]
+        if len(dupes) > 0:
+            raise Exception(f'Duplicates found in the column names: {dupes}')
         self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
         self.__remove_failed()
 
@@ -48,6 +53,8 @@ class ParamsArray(object):
             elif chars == 'Level':
                 append = True
                 label = 'Variable_{}_{}'.format(step, ptor)
+                if label in headers:
+                    label += 'b'
                 headers.append(label)
                 cols.append(idx-1)
             elif chars == 'Time':
@@ -79,6 +86,8 @@ class ParamsArray(object):
 
             if append:
                 label = '{}_{}_{}'.format(chars, step, ptor)
+                if label in headers:
+                    label += 'b'
                 headers.append(label)
                 cols.append(idx + 1)
 
@@ -143,141 +152,151 @@ class ParamsArray(object):
         if 'sfa/' in var:
             var = var.replace('sfa/', 'surf/')
 
+        # Check if composed variable
+        if f'Variable_{step}_{ptor}b' in self.data:
+            var2 = str(self.data[f'Variable_{step}_{ptor}b'].iloc[index])
+            if 'pl/r' in var and 'tcw' in var2:
+                return 'MI'
+            else:
+                return 'unknown'
+
         # Rename variables
         if 'hgt' in var:
-            var = 'Z'
+            return 'Z'
         elif 'pl/z' in var:
-            var = 'Z'
+            return 'Z'
         elif 'pl/gpa' in var:
-            var = 'ZA'
+            return 'ZA'
         elif 'pl/w' in var:
-            var = 'W'
+            return 'W'
         elif 'pl/vvel' in var:
-            var = 'W'
+            return 'W'
         elif 'pl/vo' in var:  # Vorticity (relative) (ERA-int)
-            var = 'VO'
+            return 'VO'
         elif 'pl/vpot' in var:  # Velocity potential (JRA55)
-            var = 'VPOT'
+            return 'VPOT'
         elif 'pl/vgrd' in var:
-            var = 'V'
+            return 'V'
         elif 'pl/v' in var:
-            var = 'V'
+            return 'V'
         elif 'pl/u' in var:
-            var = 'U'
+            return 'U'
         elif 'pl/depr' in var:  # Dew-point depression (JRA55)
-            var = 'DEPR'
+            return 'DEPR'
         elif 'surf/depr' in var:  # Dew-point depression (JRA55)
-            var = 'DEPR'
+            return 'DEPR'
         elif 'pl/reld' in var:  # Relative divergence (JRA55)
-            var = 'RD'
+            return 'RD'
         elif 'pl/d' in var:
-            var = 'D'
+            return 'D'
         elif 'pt/d' in var:
-            var = 'PT/D'
+            return 'PT/D'
         elif 'pl/t' in var:
-            var = 'T'
+            return 'T'
         elif 'pl/pv' in var:
-            var = 'PV'
+            return 'PV'
         elif 'pt/pv' in var:
-            var = 'PT/PV'
+            return 'PT/PV'
         elif 'pl/rh' in var:
-            var = 'RH'
+            return 'RH'
         elif 'pl/r' in var:
-            var = 'RH'
+            return 'RH'
         elif 'pv/z' in var:
-            var = 'PV/Z'
+            return 'PV/Z'
         elif 'pv/v' in var:
-            var = 'PV/V'
+            return 'PV/V'
         elif 'pv/u' in var:
-            var = 'PV/U'
+            return 'PV/U'
         elif 'pt/v' in var:
-            var = 'PT/V'
+            return 'PT/V'
         elif 'pt/u' in var:
-            var = 'PT/U'
+            return 'PT/U'
         elif 'pv/pres' in var:
-            var = 'PV/PRES'
+            return 'PV/PRES'
         elif 'pt/pres' in var:
-            var = 'PT/PRES'
+            return 'PT/PRES'
         elif 'pv/pt' in var:
-            var = 'PV/PT'
+            return 'PV/PT'
         elif 'pt/q' in var:
-            var = 'PT/SH'
+            return 'PT/SH'
         elif 'pl/q' in var:
-            var = 'SH'
+            return 'SH'
         elif 'pt/mont' in var:
-            var = 'PT/MONT'
+            return 'PT/MONT'
         elif 'surf/strd' in var:
-            var = 'STRD'
+            return 'STRD'
         elif 'single/strd' in var:
-            var = 'STRD'
+            return 'STRD'
         elif 'surf/str' in var:
-            var = 'STR'
+            return 'STR'
         elif 'single/str' in var:
-            var = 'STR'
+            return 'STR'
         elif 'surf/ssrd' in var:
-            var = 'SSRD'
+            return 'SSRD'
         elif 'single/ssrd' in var:
-            var = 'SSRD'
+            return 'SSRD'
         elif 'surf/ssr' in var:
-            var = 'SSR'
+            return 'SSR'
         elif 'single/ssr' in var:
-            var = 'SSR'
+            return 'SSR'
         elif 'surf/cape' in var:
-            var = 'CAPE'
+            return 'CAPE'
         elif 'single/cape' in var:
-            var = 'CAPE'
+            return 'CAPE'
         elif 'surf/ie' in var:
-            var = 'IE'
+            return 'IE'
         elif 'surf/v10' in var:
-            var = 'V10m'
+            return 'V10m'
         elif 'single/v10' in var:
-            var = 'V10m'
+            return 'V10m'
         elif 'surf/u10' in var:
-            var = 'U10m'
+            return 'U10m'
         elif 'surf/msl' in var:
-            var = 'SLP'
+            return 'SLP'
         elif 'surf/rh' in var:
-            var = 'RH'
+            return 'RH'
         elif 'surf/t2m' in var:
-            var = 'T2m'
+            return 'T2m'
         elif 'single/t2m' in var:
-            var = 'T2m'
+            return 'T2m'
         elif 'surf/sst' in var:
-            var = 'SST'
+            return 'SST'
         elif 'surf/d2m' in var:
-            var = 'D2m'
+            return 'D2m'
         elif 'surf/sd' in var:
-            var = 'SD'
+            return 'SD'
         elif 'surf/prmsl' in var:
-            var = 'SLP'
+            return 'SLP'
         elif 'single/tsr' in var:
-            var = 'TSR'
+            return 'TSR'
         elif 'single/ttr' in var:
-            var = 'TTR'
+            return 'TTR'
         elif 'single/sshf' in var:
-            var = 'SSHF'
+            return 'SSHF'
         elif 'single/slhf' in var:
-            var = 'SLHF'
+            return 'SLHF'
         elif 'msl/pres' in var:
-            var = 'SLP'
+            return 'SLP'
         elif 'single/lcc' in var:
-            var = 'LCC'
+            return 'LCC'
         elif 'pl/cc' in var:
-            var = 'CC'
+            return 'CC'
+        elif 'single/tcc' in var:
+            return 'TCC'
         elif 'single/deg0l' in var:
-            var = 'DEG0L'
+            return 'DEG0L'
         elif 'plf/cwat' in var:
-            var = 'CWAT'
+            return 'CWAT'
         elif 'ea/cwat' in var:
-            var = 'CWAT'
+            return 'CWAT'
         elif 'tcf/cw' in var:
-            var = 'CWAT'
+            return 'CWAT'
         elif 'tc/vwv' in var:
-            var = 'VWV'
+            return 'VWV'
         elif 'tcw' in var:
-            var = 'TCW'
+            return 'TCW'
         elif 'omega' in var:
-            var = 'W'
+            return 'W'
         return var
 
     def get_variable_and_level(self, step, ptor, index=0):
