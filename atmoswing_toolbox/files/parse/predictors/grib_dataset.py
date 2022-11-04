@@ -21,28 +21,28 @@ class Grib(Dataset):
 
     def load(self):
         try:
-            self.__list()
-            self.__extract()
+            self._list()
+            self._extract()
         except OSError as err:
             print(f"OS error: {err}")
         except Exception as e:
             print("Unexpected error:", e)
             raise
 
-    def __list(self):
+    def _list(self):
         if not os.path.isdir(self.directory):
             raise Exception(f'Directory {self.directory} not found')
 
-        self.__files = glob.glob(os.path.join(self.directory, self.file_pattern))
+        self._files = glob.glob(os.path.join(self.directory, self.file_pattern))
 
-        if len(self.__files) == 0:
+        if len(self._files) == 0:
             raise Exception(
                 f'No file found as {os.path.join(self.directory, self.file_pattern)}')
 
-        self.__files.sort()
+        self._files.sort()
 
-    def __extract(self):
-        for file in self.__files:
+    def _extract(self):
+        for file in self._files:
             if not os.path.isfile(file):
                 raise Exception(f'File {file} not found')
 
@@ -59,10 +59,10 @@ class Grib(Dataset):
                 if self.grib_version == 0:
                     self.grib_version = eccodes.codes_get_long(msgid, "editionNumber")
 
-                self.__extract_axes(msgid)
-                self.__extract_level(msgid)
-                self.__extract_time(msgid)
-                self.__extract_grib_code(msgid)
+                self._extract_axes(msgid)
+                self._extract_level(msgid)
+                self._extract_time(msgid)
+                self._extract_grib_code(msgid)
 
                 data = eccodes.codes_get_array(msgid, "values")
                 n_lats = len(self.axis_lat)
@@ -86,7 +86,7 @@ class Grib(Dataset):
 
             f.close()
 
-    def __extract_axes(self, msgid):
+    def _extract_axes(self, msgid):
         n_lats = eccodes.codes_get_long(msgid, "Nj")
         n_lons = eccodes.codes_get_long(msgid, "Ni")
         lat_start = eccodes.codes_get_long(msgid, "latitudeOfFirstGridPointInDegrees")
@@ -108,7 +108,7 @@ class Grib(Dataset):
             if not np.array_equal(self.axis_lon, axis_lon):
                 raise Exception("Only 1 extent per file is supported so far.")
 
-    def __extract_level(self, msgid):
+    def _extract_level(self, msgid):
         level = eccodes.codes_get_double(msgid, "level")
         type = eccodes.codes_get(msgid, "typeOfLevel")
         if type == "isobaricInPa":
@@ -120,7 +120,7 @@ class Grib(Dataset):
             if self.axis_level[0] != level:
                 raise Exception("Only 1 level per file is supported so far.")
 
-    def __extract_time(self, msgid):
+    def _extract_time(self, msgid):
         ref_date = dateutil.parser.parse(eccodes.codes_get_string(msgid, "dataDate"))
         ref_date_mjd = jdcal.gcal2jd(ref_date.year, ref_date.month, ref_date.day)[1]
         ref_time = eccodes.codes_get(msgid, "dataTime")
@@ -141,7 +141,7 @@ class Grib(Dataset):
 
         self.axis_time.append(time)
 
-    def __extract_grib_code(self, msgid):
+    def _extract_grib_code(self, msgid):
         discipline = 0
         category = 0
         number = 0

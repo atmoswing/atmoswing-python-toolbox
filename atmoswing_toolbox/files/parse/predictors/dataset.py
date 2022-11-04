@@ -16,7 +16,7 @@ class Dataset:
         self.directory = directory
         self.data = []
         self.data_units = None
-        self.__files = None
+        self._files = None
         self.axis_lat = []
         self.axis_lon = []
         self.axis_time = []

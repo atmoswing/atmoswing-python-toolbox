@@ -12,7 +12,7 @@ class ParamsArray:
         self.data = []
 
     def load(self):
-        file_struct = self.__parse_headers()
+        file_struct = self._parse_headers()
         # Check for duplicates
         seen = set()
         dupes = [x for x in file_struct[1] if x in seen or seen.add(x)]
@@ -20,15 +20,15 @@ class ParamsArray:
             raise Exception(f'Duplicates found in the column names: {dupes}')
         self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0],
                                 names=file_struct[1])
-        self.__remove_failed()
+        self._remove_failed()
 
     def load_scores_only(self):
-        file_struct = self.__parse_headers_scores_only()
+        file_struct = self._parse_headers_scores_only()
         self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0],
                                 names=file_struct[1])
-        self.__remove_failed()
+        self._remove_failed()
 
-    def __parse_headers(self):
+    def _parse_headers(self):
         fid = open(self.path)
         fid.readline()
         line = fid.readline().split('\t')
@@ -95,7 +95,7 @@ class ParamsArray:
 
         return [cols, headers]
 
-    def __parse_headers_scores_only(self):
+    def _parse_headers_scores_only(self):
         fid = open(self.path)
         fid.readline()
         line = fid.readline().split('\t')
@@ -117,7 +117,7 @@ class ParamsArray:
 
         return [cols, headers]
 
-    def __remove_failed(self):
+    def _remove_failed(self):
         if self.score == 'CRPS':
             # Remove 0s
             self.data.drop(self.data[self.data.Calib == 0].index, inplace=True)

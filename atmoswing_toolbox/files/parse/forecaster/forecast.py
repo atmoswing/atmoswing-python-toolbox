@@ -22,9 +22,9 @@ class Forecast:
         self.stations_y_coords = None
         self.reference_axis = None
         self.reference_values = None
-        self.__opened = False
-        self.__file = None
-        self.__use_analogs_nb_t0 = False
+        self._opened = False
+        self._file = None
+        self._use_analogs_nb_t0 = False
 
     def open(self):
         if not os.path.isfile(self.file_path):
@@ -32,77 +32,77 @@ class Forecast:
             return False
 
         # Read content
-        self.__file = Dataset(self.file_path, 'r')
+        self._file = Dataset(self.file_path, 'r')
 
         # Get version
-        self.version = self.__file.version_major + self.__file.version_minor / 10
+        self.version = self._file.version_major + self._file.version_minor / 10
 
         # Extract variables
         if self.version <= 1.1:
-            self.target_dates = self.__file.variables['targetdates']
-            self.analog_criteria = self.__file.variables['analogscriteria']
-            self.analog_dates = self.__file.variables['analogsdates']
-            self.analog_values = self.__file.variables['analogsvaluesgross']
-            self.analogs_nb = self.__file.variables['analogsnb']
-            self.stations_names = self.__file.variables['stationsnames']
-            self.stations_ids = self.__file.variables['stationsids']
-            self.stations_heights = self.__file.variables['stationsheights']
-            self.stations_x_coords = self.__file.variables['loccoordu']
-            self.stations_y_coords = self.__file.variables['loccoordv']
-            self.reference_axis = self.__file.variables['returnperiods']
-            self.reference_values = self.__file.variables[
+            self.target_dates = self._file.variables['targetdates']
+            self.analog_criteria = self._file.variables['analogscriteria']
+            self.analog_dates = self._file.variables['analogsdates']
+            self.analog_values = self._file.variables['analogsvaluesgross']
+            self.analogs_nb = self._file.variables['analogsnb']
+            self.stations_names = self._file.variables['stationsnames']
+            self.stations_ids = self._file.variables['stationsids']
+            self.stations_heights = self._file.variables['stationsheights']
+            self.stations_x_coords = self._file.variables['loccoordu']
+            self.stations_y_coords = self._file.variables['loccoordv']
+            self.reference_axis = self._file.variables['returnperiods']
+            self.reference_values = self._file.variables[
                 'dailyprecipitationsforreturnperiods']
         elif self.version <= 1.2:
-            self.target_dates = self.__file.variables['target_dates']
-            self.analog_criteria = self.__file.variables['analogs_criteria']
-            self.analog_dates = self.__file.variables['analogs_dates']
-            self.analog_values = self.__file.variables['analogs_values_gross']
-            self.analogs_nb = self.__file.variables['analogs_nb']
-            self.stations_names = self.__file.variables['stations_names']
-            self.stations_ids = self.__file.variables['stations_ids']
-            self.stations_heights = self.__file.variables['stations_heights']
-            self.stations_x_coords = self.__file.variables['loc_coord_u']
-            self.stations_y_coords = self.__file.variables['loc_coord_v']
-            self.reference_axis = self.__file.variables['reference_axis']
-            self.reference_values = self.__file.variables['reference_values']
+            self.target_dates = self._file.variables['target_dates']
+            self.analog_criteria = self._file.variables['analogs_criteria']
+            self.analog_dates = self._file.variables['analogs_dates']
+            self.analog_values = self._file.variables['analogs_values_gross']
+            self.analogs_nb = self._file.variables['analogs_nb']
+            self.stations_names = self._file.variables['stations_names']
+            self.stations_ids = self._file.variables['stations_ids']
+            self.stations_heights = self._file.variables['stations_heights']
+            self.stations_x_coords = self._file.variables['loc_coord_u']
+            self.stations_y_coords = self._file.variables['loc_coord_v']
+            self.reference_axis = self._file.variables['reference_axis']
+            self.reference_values = self._file.variables['reference_values']
         else:
-            self.target_dates = self.__file.variables['target_dates']
-            self.analog_criteria = self.__file.variables['analog_criteria']
-            self.analog_dates = self.__file.variables['analog_dates']
-            self.analog_values = self.__file.variables['analog_values']
-            self.analogs_nb = self.__file.variables['analogs_nb']
-            self.stations_names = self.__file.variables['station_names']
-            self.stations_ids = self.__file.variables['station_ids']
-            self.stations_heights = self.__file.variables['station_heights']
-            self.stations_x_coords = self.__file.variables['station_x_coords']
-            self.stations_y_coords = self.__file.variables['station_y_coords']
-            self.reference_axis = self.__file.variables['reference_axis']
-            self.reference_values = self.__file.variables['reference_values']
+            self.target_dates = self._file.variables['target_dates']
+            self.analog_criteria = self._file.variables['analog_criteria']
+            self.analog_dates = self._file.variables['analog_dates']
+            self.analog_values = self._file.variables['analog_values']
+            self.analogs_nb = self._file.variables['analogs_nb']
+            self.stations_names = self._file.variables['station_names']
+            self.stations_ids = self._file.variables['station_ids']
+            self.stations_heights = self._file.variables['station_heights']
+            self.stations_x_coords = self._file.variables['station_x_coords']
+            self.stations_y_coords = self._file.variables['station_y_coords']
+            self.reference_axis = self._file.variables['reference_axis']
+            self.reference_values = self._file.variables['reference_values']
 
-        self.__opened = True
+        self._opened = True
 
         return True
 
     def close(self):
-        self.__check_opened()
-        self.__file.close()
+        self._check_opened()
+        self._file.close()
 
-    def __check_opened(self):
-        if not self.__opened:
+    def _check_opened(self):
+        if not self._opened:
             raise Exception(f'File {self.file_path} not opened')
 
     def use_analogs_nb_t0(self):
-        self.__use_analogs_nb_t0 = True
+        self._use_analogs_nb_t0 = True
 
     def get_analogs_nb(self, time_lapse):
-        self.__check_opened()
-        if self.__use_analogs_nb_t0:
+        self._check_opened()
+        if self._use_analogs_nb_t0:
             return int(np.array(self.analogs_nb[:])[0])
         else:
             return int(np.array(self.analogs_nb[:])[time_lapse])
 
-    def __get_station_index(self, station_id):
-        self.__check_opened()
+    def _get_station_index(self, station_id):
+        self._check_opened()
         stations_ids = np.array(self.stations_ids[:])
         i_stat = np.where(stations_ids == station_id)
         if i_stat[0].size == 0:
@@ -111,14 +111,14 @@ class Forecast:
         return i_stat[0]
 
     def get_station_name(self, station_id):
-        self.__check_opened()
-        i_stat = self.__get_station_index(station_id)
+        self._check_opened()
+        i_stat = self._get_station_index(station_id)
 
         return self.stations_names[i_stat][0]
 
     def get_reference(self, station_id):
-        self.__check_opened()
-        i_stat = self.__get_station_index(station_id)
+        self._check_opened()
+        i_stat = self._get_station_index(station_id)
 
         ref_axis = np.array(self.reference_axis)
         all_ref_values = np.array(self.reference_values[:, :])
@@ -134,8 +134,8 @@ class Forecast:
         return {'axis': ref_axis, 'values': ref_values}
 
     def get_analog_values(self, station_id, time_lapse):
-        self.__check_opened()
-        i_stat = self.__get_station_index(station_id)
+        self._check_opened()
+        i_stat = self._get_station_index(station_id)
 
         analog_values = np.array(self.analog_values[:, :])
         if self.version < 1.2:

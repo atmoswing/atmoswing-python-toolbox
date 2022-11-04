@@ -59,36 +59,36 @@ class PlotsGAsVariables:
 
     def show_scatter(self):
         plt.ion()
-        self.__set_criteria_color()
-        self.__set_marker_size()
-        self.__make_scatter_plot()
+        self._set_criteria_color()
+        self._set_marker_size()
+        self._make_scatter_plot()
         plt.show()
 
     def print_scatter(self, filename):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self.__set_criteria_color()
-        self.__set_marker_size()
-        self.__make_scatter_plot()
-        self.__print(filename)
+        self._set_criteria_color()
+        self._set_marker_size()
+        self._make_scatter_plot()
+        self._print(filename)
 
     def print_syntheses(self, filename):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self.__set_criteria_color()
-        self.__make_syntheses_plot()
-        self.__print(filename)
+        self._set_criteria_color()
+        self._make_syntheses_plot()
+        self._print(filename)
 
     def load(self):
-        self.__parse_results()
-        self.__list_stations()
-        self.__drop_bad_scores()
-        self.__list_variables()
-        self.__add_variable_index()
+        self._parse_results()
+        self._list_stations()
+        self._drop_bad_scores()
+        self._list_variables()
+        self._add_variable_index()
 
-    def __parse_results(self):
+    def _parse_results(self):
         data = []
         resCheck = params.ParamsArray(self.files[0])
         resCheck.load()
@@ -133,7 +133,7 @@ class PlotsGAsVariables:
         self.data = pd.DataFrame(data, columns=labels)
         self.data.sort_values(by=['station', 'file'], inplace=True)
 
-    def __list_variables(self):
+    def _list_variables(self):
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
                 variables = self.data[f'var_{step}_{ptor}']
@@ -163,13 +163,13 @@ class PlotsGAsVariables:
         if len(self.vars) < self.variables_importance_nb:
             self.variables_importance_nb = len(self.vars)
 
-    def __list_stations(self):
+    def _list_stations(self):
         self.stations = self.data['station']
         self.stations = self.stations.drop_duplicates()
         self.stations = self.stations.sort_values(ascending=False)
         self.stations = self.stations.reset_index(drop=True)
 
-    def __add_variable_index(self):
+    def _add_variable_index(self):
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
                 label = f'var_index_{step}_{ptor}'
@@ -178,7 +178,7 @@ class PlotsGAsVariables:
                     self.data.loc[
                         self.data[f'var_{step}_{ptor}'] == self.vars[idx], label] = idx
 
-    def __set_criteria_color(self):
+    def _set_criteria_color(self):
         for step, ptors in enumerate(self.struct):
             for ptor in range(ptors):
                 label = f'crit_color_{step}_{ptor}'
@@ -189,7 +189,7 @@ class PlotsGAsVariables:
                     for index in indexes:
                         self.data[label].iloc[index] = self.colors[icrit]
 
-    def __drop_bad_scores(self):
+    def _drop_bad_scores(self):
         for station in self.stations:
             indexes = self.data.loc[self.data['station'] == station].index
             scores = self.data['score'].loc[indexes]
@@ -201,7 +201,7 @@ class PlotsGAsVariables:
             self.data.drop(index=drop_rows, inplace=True)
             self.data.reset_index(drop=True, inplace=True)
 
-    def __set_marker_size(self):
+    def _set_marker_size(self):
         if self.marker_size_on_weight:
             max_weight = 0.2
             min_weight = 0.01
@@ -233,7 +233,7 @@ class PlotsGAsVariables:
                 sizes[sizes < 1] = 1
                 self.data.loc[indexes, 'marker_size'] = sizes
 
-    def __make_scatter_plot(self):
+    def _make_scatter_plot(self):
         fig_height = 0.66 + float(len(self.vars)) * 3.7/25.0
         self.fig = plt.figure(figsize=(10, fig_height))
         plt.grid(axis='y', alpha=0.2)
@@ -289,7 +289,7 @@ class PlotsGAsVariables:
 
         self.fig.tight_layout()
 
-    def __make_syntheses_plot(self):
+    def _make_syntheses_plot(self):
         fig_height = 2 + 2 * self.variables_importance_nb * 3.7/25.0
         self.fig, axs = plt.subplots(2, 2, figsize=(10, fig_height))
         axs[0, 1].grid(axis='y', alpha=0.2)
@@ -482,7 +482,7 @@ class PlotsGAsVariables:
 
         self.fig.tight_layout()
 
-    def __print(self, filename):
+    def _print(self, filename):
         self.fig.savefig(os.path.join(self.output_path, filename + '.pdf'))
         self.fig.savefig(os.path.join(self.output_path, filename + '.png'), dpi=300)
         plt.close(self.fig)

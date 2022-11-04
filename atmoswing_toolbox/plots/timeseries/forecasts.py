@@ -23,28 +23,28 @@ class TimeSeriesForecast:
         self.ref_periods = np.array([])
         self.ref_precip = np.array([])
         self.max_val = 0
-        self.__show_legend = True
-        self.__show_dots = False
+        self._show_legend = True
+        self._show_dots = False
 
     def show(self):
         plt.ion()
-        self.__make_figure()
+        self._make_figure()
         plt.show()
 
     def print(self):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self.__make_figure()
-        self.__print()
+        self._make_figure()
+        self._print()
 
-    def __make_figure(self):
+    def _make_figure(self):
         plt.rcParams.update({'font.size': 15})
         self.fig = plt.figure(figsize=(18, 4.5))
         self.ax = self.fig.add_subplot(111)
         self.build()
 
-    def __print(self):
+    def _print(self):
         self.fig.savefig(os.path.join(self.output_path, self.output_name + '.pdf'))
         self.fig.savefig(os.path.join(self.output_path, self.output_name + '.png'),
                          dpi=300)
@@ -63,10 +63,10 @@ class TimeSeriesForecast:
         self.ref_precip = ref_precip
 
     def hide_legend(self):
-        self.__show_legend = False
+        self._show_legend = False
 
     def show_all_dots(self):
-        self.__show_dots = True
+        self._show_dots = True
 
     def set_data(self, dates, obs_values, analogs_values):
         self.dates = dates
@@ -128,7 +128,7 @@ class TimeSeriesForecast:
                                 facecolor=[0.9, 0.9, 0.9], edgecolor='None')
 
         # Plot the dots
-        if self.__show_dots:
+        if self._show_dots:
             for i in range(self.analogs_values.shape[0]):
                 self.ax.plot(plot_dates, self.analogs_values[:, i], 'ko')
 
@@ -181,7 +181,7 @@ class TimeSeriesForecast:
             plt.xlim(plot_dates[0], plot_dates[-1])
 
         # Legends
-        if self.__show_legend:
+        if self._show_legend:
             handles, labels = self.ax.get_legend_handles_labels()
             self.ax.legend(handles, labels, loc='upper left')
 

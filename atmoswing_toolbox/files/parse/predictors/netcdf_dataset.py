@@ -18,35 +18,35 @@ class NetCDF(ds):
         self.var_name = var_name
 
     def load(self, spatial_stride=0):
-        self.__list()
-        self.__extract(spatial_stride)
+        self._list()
+        self._extract(spatial_stride)
 
     def create_generic_individual_files(self, directory, var_name, spatial_stride=0):
-        self.__list()
-        for file in self.__files:
-            self.__extract_file(file, spatial_stride)
+        self._list()
+        for file in self._files:
+            self._extract_file(file, spatial_stride)
             new_reanalysis = generic.Generic(directory=directory, var_name=var_name,
                                              ref_data=self)
             new_reanalysis.generate(file_name=os.path.basename(file))
-            self.__drop_data()
+            self._drop_data()
 
-    def __list(self):
+    def _list(self):
         if not os.path.isdir(self.directory):
             raise Exception(f'Directory {self.directory} not found')
 
-        self.__files = glob.glob(os.path.join(self.directory, self.file_pattern))
+        self._files = glob.glob(os.path.join(self.directory, self.file_pattern))
 
-        if len(self.__files) == 0:
+        if len(self._files) == 0:
             raise Exception(
                 f'No file found as {os.path.join(self.directory, self.file_pattern)}')
 
-        self.__files.sort()
+        self._files.sort()
 
-    def __extract(self, spatial_stride=0):
-        for file in self.__files:
-            self.__extract_file(file, spatial_stride)
+    def _extract(self, spatial_stride=0):
+        for file in self._files:
+            self._extract_file(file, spatial_stride)
 
-    def __extract_file(self, file, stride=0):
+    def _extract_file(self, file, stride=0):
         if not os.path.isfile(file):
             raise Exception(f'File {file} not found')
 
@@ -66,7 +66,7 @@ class NetCDF(ds):
             data = np.array(var)
 
         time = np.array(nc.variables[var.dimensions[0]])
-        time = self.__convert_time(nc, var, time)
+        time = self._convert_time(nc, var, time)
 
         if not has_levels:
             new_shape = (data.shape[0], 1, data.shape[1], data.shape[2])
@@ -100,7 +100,7 @@ class NetCDF(ds):
 
         nc.close()
 
-    def __drop_data(self):
+    def _drop_data(self):
         self.data = []
         self.data_units = []
         self.axis_time = []
@@ -108,7 +108,7 @@ class NetCDF(ds):
         self.axis_lat = []
         self.axis_lon = []
 
-    def __convert_time(self, nc, var, time):
+    def _convert_time(self, nc, var, time):
         time_units = nc.variables[var.dimensions[0]].units
         str_space = time_units.find(' ')
         time_step = time_units[0:str_space]
