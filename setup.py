@@ -3,17 +3,26 @@ from setuptools import find_packages, setup
 with open('README.md') as f:
     readme = f.read()
 
-with open('LICENSE') as f:
-    license = f.read()
-
 setup(
-    name='atmoswing-toolbox',
-    version='0.1.0',
-    description='Python tools for AtmoSwing',
+    name="atmoswing-toolbox",
+    version="0.1.0",
+    author="Pascal Horton",
+    author_email="pascal.horton@giub.unibe",
+    description="Python tools for AtmoSwing",
     long_description=readme,
-    author='Pascal Horton',
-    author_email='pascal.horton@giub.unibe.ch',
-    url='https://github.com/atmoswing/atmoswing-python-toolbox',
-    license=license,
-    packages=find_packages(exclude=('tests', 'examples'))
+    long_description_content_type="text/markdown",
+    packages=find_packages(exclude=('tests', 'examples')),
+    zip_safe=False,
+    extras_require={"test": ["pytest>=6.0"]},
+    python_requires=">=3.7",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+    ],
+    readme="README.md",
+    project_urls={
+        "Source Code": "https://github.com/atmoswing/atmoswing-python-toolbox",
+        "Bug Tracker": "https://github.com/atmoswing/atmoswing-python-toolbox/issues",
+    },
+    license="MIT",
 )
