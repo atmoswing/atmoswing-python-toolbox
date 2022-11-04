@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="atmoswing-toolbox",
-    version="0.1.0",
+    version="1.1.0",
     author="Pascal Horton",
     author_email="pascal.horton@giub.unibe",
     description="Python tools for AtmoSwing",
@@ -16,6 +16,7 @@ setup(
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.7",
     classifiers=[
+        "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
     ],
