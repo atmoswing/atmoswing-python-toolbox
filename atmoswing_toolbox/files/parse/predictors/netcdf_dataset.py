@@ -5,9 +5,9 @@ import dateutil.parser
 import numpy as np
 from netCDF4 import Dataset
 
-from atmoswing.external import jdcal
-from atmoswing.files.create.predictors import generic
-from atmoswing.files.parse.predictors.dataset import Dataset as ds
+from atmoswing_toolbox.external import jdcal
+from atmoswing_toolbox.files.create.predictors import generic
+from atmoswing_toolbox.files.parse.predictors.dataset import Dataset as ds
 
 
 class NetCDF(ds):

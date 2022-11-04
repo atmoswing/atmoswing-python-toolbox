@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 
-from atmoswing.plots.gas import variables
+from atmoswing_toolbox.plots.gas import variables
 
 era5_results = True
 

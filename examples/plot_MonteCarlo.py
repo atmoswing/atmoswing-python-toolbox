@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from atmoswing.plots import montecarlo
+from atmoswing_toolbox.plots import montecarlo
 
 base_dir = '...'
 output_path = base_dir + '_Plots\\'

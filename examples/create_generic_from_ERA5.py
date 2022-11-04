@@ -2,8 +2,8 @@
 
 import os
 
-from atmoswing.files.create.predictors import generic
-from atmoswing.files.parse.predictors import netcdf_dataset
+from atmoswing_toolbox.files.create.predictors import generic
+from atmoswing_toolbox.files.parse.predictors import netcdf_dataset
 
 dir_origin = 'path/to/data'
 dir_target = 'path/to/outputs'
