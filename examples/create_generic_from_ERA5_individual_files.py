@@ -8,7 +8,7 @@ dir_target = 'path/to/outputs'
 
 files_list = [['', 'z', 'z']]
 
-spatial_stride = 8  # 1°
+spatial_stride = 4  # 1°
 
 for file in files_list:
     dir_origin_files = os.path.join(dir_origin, file[0])

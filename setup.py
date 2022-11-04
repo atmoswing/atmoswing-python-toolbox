@@ -10,7 +10,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='atmoswing',
+    name='atmoswing-toolbox',
     version='0.1.0',
     description='Package for AtmoSwing',
     long_description=readme,
