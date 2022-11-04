@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import os
+
 from netCDF4 import Dataset
 
 NETCDF_3 = 0
@@ -9,7 +8,7 @@ NETCDF_4 = 1
 """ NetCDF 4 format - smaller but longer to read """
 
 
-class Generic(object):
+class Generic:
     """Generic predictors dataset"""
 
     def __init__(self, directory, var_name, ref_data):
@@ -37,10 +36,10 @@ class Generic(object):
             nc.standardization_sd = self.ref_data.sd
 
         # Dimensions
-        dim_time = nc.createDimension("time", shape[0])
-        dim_level = nc.createDimension("level", shape[1])
-        dim_lat = nc.createDimension("lat", shape[2])
-        dim_lon = nc.createDimension("lon", shape[3])
+        nc.createDimension("time", shape[0])
+        nc.createDimension("level", shape[1])
+        nc.createDimension("lat", shape[2])
+        nc.createDimension("lon", shape[3])
 
         # Variables
         var_level = nc.createVariable("level", "f4", ("level",))
@@ -48,11 +47,14 @@ class Generic(object):
         var_lon = nc.createVariable("lon", "f4", ("lon",))
         if format == NETCDF_3:
             var_time = nc.createVariable("time", "f4", ("time",))
-            var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",))
+            var_data = nc.createVariable(self.var_name, "f4",
+                                         ("time", "level", "lat", "lon",))
         else:
             var_time = nc.createVariable("time", "f4", ("time",),
-                                         zlib=True, complevel=6, least_significant_digit=4)
-            var_data = nc.createVariable(self.var_name, "f4", ("time", "level", "lat", "lon",),
+                                         zlib=True, complevel=6,
+                                         least_significant_digit=4)
+            var_data = nc.createVariable(self.var_name, "f4",
+                                         ("time", "level", "lat", "lon",),
                                          zlib=True, complevel=6)
 
         # Attributes

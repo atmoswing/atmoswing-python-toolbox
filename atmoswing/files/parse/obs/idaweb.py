@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 import os
+
 import numpy as np
 
 
-class Idaweb(object):
+class Idaweb:
     """Extract Idaweb (MeteoSwiss) time series"""
 
     def __init__(self, file_path='', header_lines=3):
@@ -13,12 +12,12 @@ class Idaweb(object):
 
     def parse(self):
         if not os.path.isfile(self.file_path):
-            raise Exception('File {} not found'.format(self.file_path))
+            raise Exception(f'File {self.file_path} not found')
 
         matrix = []
 
         # Read content
-        fid = open(self.file_path, "r")
+        fid = open(self.file_path)
         file_content = fid.readlines()
 
         for line in file_content:

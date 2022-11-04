@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 """Functions for converting between Julian dates and calendar dates.
 
 A function for converting Gregorian calendar dates to Julian dates, and
@@ -38,8 +37,7 @@ inspired by the IAU SOFA C library.
 :contact: prasanthhn@gmail.com
 :license: BSD (http://www.opensource.org/licenses/bsd-license.php)
 """
-from __future__ import division
-from __future__ import print_function
+
 import math
 
 __version__ = "1.0"
@@ -287,16 +285,16 @@ def jd2gcal(jd1, jd2):
         jd_i -= 1
         f += 1.5
 
-    l = jd_i + 68569
-    n = ipart((4 * l) / 146097.0)
-    l -= ipart(((146097 * n) + 3) / 4.0)
-    i = ipart((4000 * (l + 1)) / 1461001)
-    l -= ipart((1461 * i) / 4.0) - 31
-    j = ipart((80 * l) / 2447.0)
-    day = l - ipart((2447 * j) / 80.0)
-    l = ipart(j / 11.0)
-    month = j + 2 - (12 * l)
-    year = 100 * (n - 49) + i + l
+    l_val = jd_i + 68569
+    n = ipart((4 * l_val) / 146097.0)
+    l_val -= ipart(((146097 * n) + 3) / 4.0)
+    i = ipart((4000 * (l_val + 1)) / 1461001)
+    l_val -= ipart((1461 * i) / 4.0) - 31
+    j = ipart((80 * l_val) / 2447.0)
+    day = l_val - ipart((2447 * j) / 80.0)
+    l_val = ipart(j / 11.0)
+    month = j + 2 - (12 * l_val)
+    year = 100 * (n - 49) + i + l_val
 
     return int(year), int(month), int(day), f
 
@@ -433,9 +431,9 @@ def jd2jcal(jd1, jd2):
 
     j = jd_i + 1402.0
     k = ipart((j - 1) / 1461.0)
-    l = j - (1461.0 * k)
-    n = ipart((l - 1) / 365.0) - ipart(l / 1461.0)
-    i = l - (365.0 * n) + 30.0
+    l_v = j - (1461.0 * k)
+    n = ipart((l_v - 1) / 365.0) - ipart(l_v / 1461.0)
+    i = l_v - (365.0 * n) + 30.0
     j = ipart((80.0 * i) / 2447.0)
     day = i - ipart((2447.0 * j) / 80.0)
     i = ipart(j / 11.0)

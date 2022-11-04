@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-
-import os
 import math
-import matplotlib.pyplot as plt
+import os
+
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import matplotlib.font_manager as fontmanager
 import numpy as np
 
 
-class TimeSeriesForecast(object):
+class TimeSeriesForecast:
     """Base class to create a time serie of forecast"""
 
     def __init__(self, output_path=''):
@@ -48,7 +46,8 @@ class TimeSeriesForecast(object):
 
     def __print(self):
         self.fig.savefig(os.path.join(self.output_path, self.output_name + '.pdf'))
-        self.fig.savefig(os.path.join(self.output_path, self.output_name + '.png'), dpi=300)
+        self.fig.savefig(os.path.join(self.output_path, self.output_name + '.png'),
+                         dpi=300)
         plt.close(self.fig)
 
     def set_output_name(self, name):
@@ -80,7 +79,7 @@ class TimeSeriesForecast(object):
     def build(self):
         # Split data if we focus on a period
         if self.start and self.end:
-            start_array = np.searchsorted(self.dates, self.start.toordinal() - 678575 - 1)
+            start_array = np.searchsorted(self.dates, self.start.toordinal() - 678576)
             end_array = np.searchsorted(self.dates, self.end.toordinal() - 678575)
             self.analogs_values = self.analogs_values[start_array:end_array, :]
             self.dates = self.dates[start_array:end_array]
@@ -90,7 +89,6 @@ class TimeSeriesForecast(object):
         plot_dates = self.dates + 678575 + 1
 
         # Extract quantiles
-        q000 = np.nanmean(np.percentile(self.analogs_values, 0, axis=2), axis=0)
         q030 = np.nanmean(np.percentile(self.analogs_values, 30, axis=2), axis=0)
         q060 = np.nanmean(np.percentile(self.analogs_values, 60, axis=2), axis=0)
         q090_all = np.percentile(self.analogs_values, 90, axis=2)
@@ -100,24 +98,33 @@ class TimeSeriesForecast(object):
         # Plot the reference values
         plot_obs = self.obs_values
         plot_obs[np.isnan(q100)] = np.nan
-        self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='r', label="observations")
+        self.ax.plot(plot_dates, plot_obs, '-', linewidth=2, color='r',
+                     label="observations")
 
         # Plot areas and lines
-        self.ax.fill_between(plot_dates, q030, q060, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
-        self.ax.fill_between(plot_dates, q060, q090, facecolor=[0.6, 0.6, 0.6], edgecolor='None')
-        self.ax.plot(plot_dates, q030, '--', linewidth=1, color='k', label="mean quantile 30\%")
-        self.ax.plot(plot_dates, q060, '-', linewidth=1, color='k', label="mean quantile 60\%")
-        self.ax.plot(plot_dates, q090_all[0], ':', linewidth=1, color='k', label="single quantile 90\%")
+        self.ax.fill_between(plot_dates, q030, q060, facecolor=[0.6, 0.6, 0.6],
+                             edgecolor='None')
+        self.ax.fill_between(plot_dates, q060, q090, facecolor=[0.6, 0.6, 0.6],
+                             edgecolor='None')
+        self.ax.plot(plot_dates, q030, '--', linewidth=1, color='k',
+                     label=r"mean quantile 30\%")
+        self.ax.plot(plot_dates, q060, '-', linewidth=1, color='k',
+                     label=r"mean quantile 60\%")
+        self.ax.plot(plot_dates, q090_all[0], ':', linewidth=1, color='k',
+                     label=r"single quantile 90\%")
         self.ax.plot(plot_dates, q090_all[1], ':', linewidth=1, color='k')
         self.ax.plot(plot_dates, q090_all[2], ':', linewidth=1, color='k')
         self.ax.plot(plot_dates, q090_all[3], ':', linewidth=1, color='k')
-        self.ax.plot(plot_dates, q090, '--', linewidth=1, color='k', label="mean quantile 90\%")
-        self.ax.plot(plot_dates, q100, 'x', markersize=3, color='0.5', label="mean maximum")
+        self.ax.plot(plot_dates, q090, '--', linewidth=1, color='k',
+                     label=r"mean quantile 90\%")
+        self.ax.plot(plot_dates, q100, 'x', markersize=3, color='0.5',
+                     label="mean maximum")
 
         # Gray nan areas
         for idx, val in enumerate(q100):
             if math.isnan(val):
-                self.ax.axvspan(plot_dates[max(idx - 1, 0)], plot_dates[min(idx + 1, plot_dates.size - 1)],
+                self.ax.axvspan(plot_dates[max(idx - 1, 0)],
+                                plot_dates[min(idx + 1, plot_dates.size - 1)],
                                 facecolor=[0.9, 0.9, 0.9], edgecolor='None')
 
         # Plot the dots
@@ -160,7 +167,8 @@ class TimeSeriesForecast(object):
         # Draw line return periods P10
         if self.ref_periods.size == 0 and self.ref_precip.size == 0:
             p10_index = np.searchsorted(self.ref_periods, 10)
-            plt.axhline(y=self.ref_precip[p10_index], linewidth=2, color='r', label="return period of 10 years")
+            plt.axhline(y=self.ref_precip[p10_index], linewidth=2, color='r',
+                        label="return period of 10 years")
 
         # Set correct limits
         plt.ylim(bottom=0)
@@ -175,6 +183,6 @@ class TimeSeriesForecast(object):
         # Legends
         if self.__show_legend:
             handles, labels = self.ax.get_legend_handles_labels()
-            self.ax.legend(handles, labels, loc='upper left')  # prop=fontmanager.FontProperties(size="smaller")
+            self.ax.legend(handles, labels, loc='upper left')
 
         self.fig.tight_layout()

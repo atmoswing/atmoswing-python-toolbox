@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
-
-import os
 import glob
+import os
+
 import dateutil.parser
 import numpy as np
 from netCDF4 import Dataset
+
 from atmoswing.external import jdcal
-from atmoswing.files.parse.predictors.dataset import Dataset as ds
 from atmoswing.files.create.predictors import generic
+from atmoswing.files.parse.predictors.dataset import Dataset as ds
 
 
 class NetCDF(ds):
@@ -25,18 +25,20 @@ class NetCDF(ds):
         self.__list()
         for file in self.__files:
             self.__extract_file(file, spatial_stride)
-            new_reanalysis = generic.Generic(directory=directory, var_name=var_name, ref_data=self)
+            new_reanalysis = generic.Generic(directory=directory, var_name=var_name,
+                                             ref_data=self)
             new_reanalysis.generate(file_name=os.path.basename(file))
             self.__drop_data()
 
     def __list(self):
         if not os.path.isdir(self.directory):
-            raise Exception('Directory {} not found'.format(self.directory))
+            raise Exception(f'Directory {self.directory} not found')
 
         self.__files = glob.glob(os.path.join(self.directory, self.file_pattern))
 
         if len(self.__files) == 0:
-            raise Exception('No file found as {}'.format(os.path.join(self.directory, self.file_pattern)))
+            raise Exception(
+                f'No file found as {os.path.join(self.directory, self.file_pattern)}')
 
         self.__files.sort()
 
@@ -44,9 +46,9 @@ class NetCDF(ds):
         for file in self.__files:
             self.__extract_file(file, spatial_stride)
 
-    def __extract_file(self, file, spatial_stride=0):
+    def __extract_file(self, file, stride=0):
         if not os.path.isfile(file):
-            raise Exception('File {} not found'.format(file))
+            raise Exception(f'File {file} not found')
 
         print('Reading ' + file)
         nc = Dataset(file, 'r')
@@ -54,11 +56,11 @@ class NetCDF(ds):
 
         has_levels = len(var.dimensions) == 4
 
-        if spatial_stride > 1:
+        if stride > 1:
             if has_levels:
-                dat = nc.variables[self.var_name][:, :, 0::spatial_stride, 0::spatial_stride]
+                dat = nc.variables[self.var_name][:, :, 0::stride, 0::stride]
             else:
-                dat = nc.variables[self.var_name][:, 0::spatial_stride, 0::spatial_stride]
+                dat = nc.variables[self.var_name][:, 0::stride, 0::stride]
             data = np.array(dat)
         else:
             data = np.array(var)
@@ -78,16 +80,20 @@ class NetCDF(ds):
                 self.axis_level = np.array(nc.variables[var.dimensions[1]])
                 self.axis_lat = np.array(nc.variables[var.dimensions[2]])
                 self.axis_lon = np.array(nc.variables[var.dimensions[3]])
-                if spatial_stride > 1:
-                    self.axis_lat = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
-                    self.axis_lon = np.array(nc.variables[var.dimensions[3]][0::spatial_stride])
+                if stride > 1:
+                    self.axis_lat = np.array(
+                        nc.variables[var.dimensions[2]][0::stride])
+                    self.axis_lon = np.array(
+                        nc.variables[var.dimensions[3]][0::stride])
             else:
                 self.axis_level = [0]
                 self.axis_lat = np.array(nc.variables[var.dimensions[1]])
                 self.axis_lon = np.array(nc.variables[var.dimensions[2]])
-                if spatial_stride > 1:
-                    self.axis_lat = np.array(nc.variables[var.dimensions[1]][0::spatial_stride])
-                    self.axis_lon = np.array(nc.variables[var.dimensions[2]][0::spatial_stride])
+                if stride > 1:
+                    self.axis_lat = np.array(
+                        nc.variables[var.dimensions[1]][0::stride])
+                    self.axis_lon = np.array(
+                        nc.variables[var.dimensions[2]][0::stride])
         else:
             self.data = np.append(self.data, data, axis=0)
             self.axis_time = np.append(self.axis_time, time, axis=0)

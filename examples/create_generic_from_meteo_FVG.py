@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 import os
-os.environ.setdefault("ECCODES_DIR", "/usr/local/")
-from atmoswing.files.parse.predictors import dataset
-from atmoswing.files.parse.predictors import grib_dataset
+
 from atmoswing.files.create.predictors import generic
+from atmoswing.files.parse.predictors import dataset, grib_dataset
+
+os.environ.setdefault("ECCODES_DIR", "/usr/local/")
 
 dir_origin = 'path/to/data'
 dir_target = 'path/to/outputs'
@@ -30,9 +31,12 @@ for file in files_list:
     pattern = file[1]
     var_name_target = file[2]
 
-    reanalysis = grib_dataset.Grib(directory=dir_origin_files, file_pattern=pattern)
+    reanalysis = grib_dataset.Grib(directory=dir_origin_files,
+                                   file_pattern=pattern)
     reanalysis.load()
     reanalysis.standardize(mode=dataset.DOMAIN_WISE)
     print('Creating new file.')
-    new_reanalysis = generic.Generic(directory=dir_target_files, var_name=var_name_target, ref_data=reanalysis)
+    new_reanalysis = generic.Generic(directory=dir_target_files,
+                                     var_name=var_name_target,
+                                     ref_data=reanalysis)
     new_reanalysis.generate(format=generic.NETCDF_4)

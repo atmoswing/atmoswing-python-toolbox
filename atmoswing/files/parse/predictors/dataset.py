@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-import os
-import numpy as np
 from math import nan
+
+import numpy as np
 
 DOMAIN_WISE = 0
 """ Domain wise """
@@ -10,7 +8,7 @@ POINT_WISE = 1
 """ Point wise """
 
 
-class Dataset(object):
+class Dataset:
     """Generic (parent) class not to be used directly. Use Grib or Netcdf datasets."""
 
     def __init__(self, directory, file_pattern):
@@ -31,13 +29,13 @@ class Dataset(object):
         if mode == DOMAIN_WISE:
             self.mean = np.mean(self.data)
             self.sd = np.std(self.data)
-            print("mean = {}, sd = {}".format(self.mean, self.sd))
+            print(f"mean = {self.mean}, sd = {self.sd}")
             self.data = (self.data - self.mean) / self.sd
         elif mode == POINT_WISE:
             raise Exception("Not tested and likely not working properly.")
             self.mean = np.mean(self.data, axis=0)
             self.sd = np.std(self.data, axis=0)
-            print("mean = {}, sd = {}".format(self.mean, self.sd))
+            print(f"mean = {self.mean}, sd = {self.sd}")
             self.data = (self.data - self.mean) / self.sd
         else:
             raise Exception("Wrong mode for the standardization.")

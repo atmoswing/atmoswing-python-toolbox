@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import pandas as pd
 
 
-class ParamsArray(object):
+class ParamsArray:
     """Parsing of the parameters resulting from the optimizer"""
 
     def __init__(self, path):
@@ -20,16 +18,18 @@ class ParamsArray(object):
         dupes = [x for x in file_struct[1] if x in seen or seen.add(x)]
         if len(dupes) > 0:
             raise Exception(f'Duplicates found in the column names: {dupes}')
-        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
+        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0],
+                                names=file_struct[1])
         self.__remove_failed()
 
     def load_scores_only(self):
         file_struct = self.__parse_headers_scores_only()
-        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0], names=file_struct[1])
+        self.data = pd.read_csv(self.path, sep='\t', skiprows=1, usecols=file_struct[0],
+                                names=file_struct[1])
         self.__remove_failed()
 
     def __parse_headers(self):
-        fid = open(self.path, "r")
+        fid = open(self.path)
         fid.readline()
         line = fid.readline().split('\t')
         self.id = line[1]
@@ -47,12 +47,12 @@ class ParamsArray(object):
                 ptor = int(chars[8:-1])
                 self.struct[step] = ptor + 1
             elif chars == 'Anb':
-                label = 'Anb_{}'.format(step)
+                label = f'Anb_{step}'
                 headers.append(label)
                 cols.append(idx + 1)
             elif chars == 'Level':
                 append = True
-                label = 'Variable_{}_{}'.format(step, ptor)
+                label = f'Variable_{step}_{ptor}'
                 if label in headers:
                     label += 'b'
                 headers.append(label)
@@ -85,7 +85,7 @@ class ParamsArray(object):
                 self.score = line[idx + 1]
 
             if append:
-                label = '{}_{}_{}'.format(chars, step, ptor)
+                label = f'{chars}_{step}_{ptor}'
                 if label in headers:
                     label += 'b'
                 headers.append(label)
@@ -96,7 +96,7 @@ class ParamsArray(object):
         return [cols, headers]
 
     def __parse_headers_scores_only(self):
-        fid = open(self.path, "r")
+        fid = open(self.path)
         fid.readline()
         line = fid.readline().split('\t')
         self.id = line[1]
@@ -135,13 +135,13 @@ class ParamsArray(object):
         return self.struct[step]
 
     def get_anbs(self, step):
-        return int(self.data['Anb_{}'.format(step)])
+        return int(self.data[f'Anb_{step}'])
 
     def get_variables(self, step, ptor):
-        return self.data['Variable_{}_{}'.format(step, ptor)]
+        return self.data[f'Variable_{step}_{ptor}']
 
     def get_variable(self, step, ptor, index=0):
-        var = str(self.data['Variable_{}_{}'.format(step, ptor)].iloc[index])
+        var = str(self.data[f'Variable_{step}_{ptor}'].iloc[index])
         # Map levels
         if 'pressure/' in var:
             var = var.replace('pressure/', 'pl/')
@@ -307,67 +307,69 @@ class ParamsArray(object):
         return var
 
     def get_levels(self, step, ptor):
-        return self.data['Level_{}_{}'.format(step, ptor)]
+        return self.data[f'Level_{step}_{ptor}']
 
     def get_level(self, step, ptor, index=0):
-        return self.data['Level_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'Level_{step}_{ptor}'].iloc[index]
 
     def get_times(self, step, ptor):
-        return self.data['Time_{}_{}'.format(step, ptor)]
+        return self.data[f'Time_{step}_{ptor}']
 
     def get_time(self, step, ptor, index=0):
-        return self.data['Time_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'Time_{step}_{ptor}'].iloc[index]
 
     def get_xmins(self, step, ptor):
-        return self.data['xMin_{}_{}'.format(step, ptor)]
+        return self.data[f'xMin_{step}_{ptor}']
 
     def get_xmin(self, step, ptor, index=0):
-        return self.data['xMin_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'xMin_{step}_{ptor}'].iloc[index]
 
     def get_xmaxs(self, step, ptor):
-        return self.data['xMin_{}_{}'.format(step, ptor)] + \
-               (self.data['xPtsNb_{}_{}'.format(step, ptor)] - 1) * self.data['xStep_{}_{}'.format(step, ptor)]
+        return self.data[f'xMin_{step}_{ptor}'] + \
+               (self.data[f'xPtsNb_{step}_{ptor}'] - 1) * self.data[
+                   f'xStep_{step}_{ptor}']
 
     def get_xmax(self, step, ptor, index=0):
-        return self.data['xMin_{}_{}'.format(step, ptor)].iloc[index] + \
-               (self.data['xPtsNb_{}_{}'.format(step, ptor)].iloc[index] - 1) * \
-               self.data['xStep_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'xMin_{step}_{ptor}'].iloc[index] + \
+               (self.data[f'xPtsNb_{step}_{ptor}'].iloc[index] - 1) * \
+               self.data[f'xStep_{step}_{ptor}'].iloc[index]
 
     def get_xptsnbs(self, step, ptor):
-        return self.data['xPtsNb_{}_{}'.format(step, ptor)]
+        return self.data[f'xPtsNb_{step}_{ptor}']
 
     def get_ymins(self, step, ptor):
-        return self.data['yMin_{}_{}'.format(step, ptor)]
+        return self.data[f'yMin_{step}_{ptor}']
 
     def get_ymin(self, step, ptor, index=0):
-        return self.data['yMin_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'yMin_{step}_{ptor}'].iloc[index]
 
     def get_ymaxs(self, step, ptor):
-        return self.data['yMin_{}_{}'.format(step, ptor)] + \
-               (self.data['yPtsNb_{}_{}'.format(step, ptor)] - 1) * self.data['yStep_{}_{}'.format(step, ptor)]
+        return self.data[f'yMin_{step}_{ptor}'] + \
+               (self.data[f'yPtsNb_{step}_{ptor}'] - 1) * self.data[
+                   f'yStep_{step}_{ptor}']
 
     def get_ymax(self, step, ptor, index=0):
-        return self.data['yMin_{}_{}'.format(step, ptor)].iloc[index] + \
-               (self.data['yPtsNb_{}_{}'.format(step, ptor)].iloc[index] - 1) * \
-               self.data['yStep_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'yMin_{step}_{ptor}'].iloc[index] + \
+               (self.data[f'yPtsNb_{step}_{ptor}'].iloc[index] - 1) * \
+               self.data[f'yStep_{step}_{ptor}'].iloc[index]
 
     def get_yptsnbs(self, step, ptor):
-        return self.data['yPtsNb_{}_{}'.format(step, ptor)]
+        return self.data[f'yPtsNb_{step}_{ptor}']
 
     def get_weight(self, step, ptor, index=0):
-        return self.data['Weight_{}_{}'.format(step, ptor)].iloc[index]
+        return self.data[f'Weight_{step}_{ptor}'].iloc[index]
 
     def get_weights(self, step, ptor):
-        return self.data['Weight_{}_{}'.format(step, ptor)]
+        return self.data[f'Weight_{step}_{ptor}']
 
     def get_criterion(self, step, ptor, index=0):
-        criterion = self.data['Criteria_{}_{}'.format(step, ptor)].iloc[index]
+        criterion = self.data[f'Criteria_{step}_{ptor}'].iloc[index]
         if 'grads' in criterion:
             criterion = criterion[0:-5]
         return criterion
 
     def get_criteria(self, step, ptor):
-        return self.data['Criteria_{}_{}'.format(step, ptor)]
+        return self.data[f'Criteria_{step}_{ptor}']
 
     def get_calib_scores(self):
         return self.data['Calib']

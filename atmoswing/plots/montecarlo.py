@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
+
 from atmoswing.files.parse.optimizer import params
 
 
-class PlotsParamsSensitivity(object):
+class PlotsParamsSensitivity:
     """Plotting the results of the Monte Carlo analysis"""
 
     def __init__(self, file, output_path=''):
@@ -39,15 +39,16 @@ class PlotsParamsSensitivity(object):
 
         # Make some checks
         if len(other_result.get_anbs(0)) != 1:
-            raise Exception('The parameters file should contain exactly 1 set (the file has {}).'
-                            .format(other_result.get_anbs(0)))
+            raise Exception(f'The parameters file should contain exactly 1 set '
+                            f'(the file has {other_result.get_anbs(0)}).')
         if len(self.results.struct) != len(other_result.struct):
-            raise Exception('The number of steps is different between files ({} vs {}).'
-                            .format(len(self.results.struct), len(other_result.struct)))
+            raise Exception(f'The number of steps is different between files '
+                            f'({len(self.results.struct)} vs '
+                            f'{len(other_result.struct)}).')
         for i_step, step in enumerate(self.results.struct):
             if step != other_result.struct[i_step]:
-                raise Exception('The number of predictors is different between files ({} vs {}).'
-                                .format(step, other_result.struct[i_step]))
+                raise Exception(f'The number of predictors is different between files '
+                                f'({step} vs {other_result.struct[i_step]}).')
         # Store data
         if (period == 'valid') or (period == 'validation'):
             self.other_results_score.append(other_result.get_valid_score())
@@ -58,21 +59,22 @@ class PlotsParamsSensitivity(object):
             if color == '':
                 color = 'red'
         else:
-            raise Exception('The provided period {} is not recognized.'.format(period))
+            raise Exception(f'The provided period {period} is not recognized.')
 
         self.other_results.append(other_result)
         self.other_results_markers.append(marker)
         self.other_results_colors.append(color)
 
     def __loop_structure(self):
-        for self.__step, step in enumerate(self.results.struct):
-            title = 'Level {}'.format(self.__step + 1)
+        for i_step, step in enumerate(self.results.struct):
+            title = f'Level {i_step + 1}'
             self.make_plot('anb', xlabel='Number of analogues', title=title)
             self.__print_or_show(title, 'Number of analogues')
             for self.__ptor in range(0, step):
-                title = 'Level {} - {}{} {}h'.format(self.__step + 1, self.results.get_variable(self.__step, self.__ptor),
-                                                     self.results.get_level(self.__step, self.__ptor),
-                                                     self.results.get_time(self.__step, self.__ptor))
+                title = f'Level {i_step + 1} - ' \
+                        f'{self.results.get_variable(i_step, self.__ptor)}' \
+                        f'{self.results.get_level(i_step, self.__ptor)} ' \
+                        f'{self.results.get_time(i_step, self.__ptor)}h'
                 self.make_plot('xmin', xlabel='Minimum longitude [°]', title=title)
                 self.__print_or_show(title, 'Minimum longitude [°]')
                 self.make_plot('xmax', xlabel='Maximum longitude [°]', title=title)
@@ -98,7 +100,8 @@ class PlotsParamsSensitivity(object):
             values = self.results.get_ymins(self.__step, self.__ptor)
         elif var == 'ymax':
             values = self.results.get_ymaxs(self.__step, self.__ptor)
-        plt.scatter(values, score, c='', edgecolors=(0.2, 0.2, 0.2, 0.7), linewidths=0.5, s=30)
+        plt.scatter(values, score, c='', edgecolors=(0.2, 0.2, 0.2, 0.7),
+                    linewidths=0.5, s=30)
 
         # Other values (ex. from calibration or GAs)
         for idx, res in enumerate(self.other_results):

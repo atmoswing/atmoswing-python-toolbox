@@ -1,5 +1,5 @@
-numpy
-pandas
+eccodes
 matplotlib
 netCDF4
-eccodes
+numpy
+pandas

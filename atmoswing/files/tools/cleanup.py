@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-import os
 import glob
+import os
 
 
 def log_file_is_empty(file):
@@ -20,7 +18,7 @@ def cleanup_empty_log_files(base_path):
         for f in logs:
             if log_file_is_empty(f):
                 os.remove(f)
-                print('{} removed'.format(f))
+                print(f'{f} removed')
 
 
 def cleanup_duplicate_ini_files(base_path):
@@ -29,7 +27,7 @@ def cleanup_duplicate_ini_files(base_path):
         files = glob.glob(path + '/AtmoSwing-*.ini')
         for f in files:
             os.remove(f)
-            print('{} removed'.format(f))
+            print(f'{f} removed')
 
 
 def cleanup_old_generations(base_path):
@@ -41,7 +39,7 @@ def cleanup_old_generations(base_path):
         files_operators.sort()
         for f in files_generations[:-1]:
             os.remove(f)
-            print('{} removed'.format(f))
+            print(f'{f} removed')
         for f in files_operators[:-1]:
             os.remove(f)
-            print('{} removed'.format(f))
+            print(f'{f} removed')

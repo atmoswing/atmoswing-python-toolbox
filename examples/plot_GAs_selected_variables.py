@@ -1,15 +1,15 @@
 #!/usr/bin/python
 
-import os
 import matplotlib.pyplot as plt
+
 from atmoswing.plots.gas import variables
 
 era5_results = True
 
 if era5_results:
-    base_dir = 'D:\\_Unibe\\2020 Analogs IVS\\Analyses\\4 - GAs optim ERA5\\results\\2*/'
+    base_dir = 'path/to/data'
 else:
-    base_dir = 'D:\\_Unibe\\2020 Analogs IVS\\Analyses\\3 - GAs optim all catchments\\results\\1*/'
+    base_dir = 'path/to/data'
 
 output_path = base_dir + '\\..\\'
 

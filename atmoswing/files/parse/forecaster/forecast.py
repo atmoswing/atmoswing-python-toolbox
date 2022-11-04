@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import os
+
 import numpy as np
 from netCDF4 import Dataset
 
 
-class Forecast(object):
+class Forecast:
     """Extract AtmoSwing Forecaster outputs"""
 
     def __init__(self, file_path=''):
@@ -29,7 +28,7 @@ class Forecast(object):
 
     def open(self):
         if not os.path.isfile(self.file_path):
-            print('File {} not found'.format(self.file_path))
+            print(f'File {self.file_path} not found')
             return False
 
         # Read content
@@ -51,7 +50,8 @@ class Forecast(object):
             self.stations_x_coords = self.__file.variables['loccoordu']
             self.stations_y_coords = self.__file.variables['loccoordv']
             self.reference_axis = self.__file.variables['returnperiods']
-            self.reference_values = self.__file.variables['dailyprecipitationsforreturnperiods']
+            self.reference_values = self.__file.variables[
+                'dailyprecipitationsforreturnperiods']
         elif self.version <= 1.2:
             self.target_dates = self.__file.variables['target_dates']
             self.analog_criteria = self.__file.variables['analogs_criteria']
@@ -89,7 +89,7 @@ class Forecast(object):
 
     def __check_opened(self):
         if not self.__opened:
-            raise Exception('File {} not opened'.format(self.file_path))
+            raise Exception(f'File {self.file_path} not opened')
 
     def use_analogs_nb_t0(self):
         self.__use_analogs_nb_t0 = True
@@ -106,7 +106,7 @@ class Forecast(object):
         stations_ids = np.array(self.stations_ids[:])
         i_stat = np.where(stations_ids == station_id)
         if i_stat[0].size == 0:
-            raise Exception('Station id {} not found'.format(station_id))
+            raise Exception(f'Station id {station_id} not found')
 
         return i_stat[0]
 
@@ -149,6 +149,6 @@ class Forecast(object):
         col_start = 0
         for i_lapse in np.arange(time_lapse):
             col_start = col_start + np.array(self.analogs_nb[:])[i_lapse]
-        col_end = col_start + nb_analogs  # do not put -1 because of Python's way to handle arrays
+        col_end = col_start + nb_analogs
 
         return analog_values[i_stat, col_start:col_end]
