@@ -2,16 +2,15 @@ import glob
 import os
 
 
-def log_file_is_empty(file):
-    if os.stat(file).st_size == 0:
-        return True
-    with open(file) as f:
-        if 'Optimization has already converged.' in f.read():
-            return True
-    return False
-
-
 def cleanup_empty_log_files(base_path):
+    def log_file_is_empty(file):
+        if os.stat(file).st_size == 0:
+            return True
+        with open(file) as fi:
+            if 'Optimization has already converged.' in fi.read():
+                return True
+        return False
+
     for x in os.listdir(base_path):
         path = os.path.join(base_path, x)
         logs = glob.glob(path + '/AtmoSwingOptimizer*.log')

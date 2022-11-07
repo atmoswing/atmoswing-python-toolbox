@@ -9,7 +9,7 @@ NETCDF_4 = 1
 
 
 class Generic:
-    """Generic predictors dataset"""
+    """Generic dataset"""
 
     def __init__(self, directory, var_name, ref_data):
         self.directory = directory

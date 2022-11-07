@@ -5,11 +5,11 @@ import dateutil.parser
 import eccodes
 import numpy as np
 
-from atmoswing_toolbox.external import jdcal
-from atmoswing_toolbox.files.parse.predictors.dataset import Dataset
+from atmoswing_toolbox.datasets.predictor_dataset import PredictorDataset
+from atmoswing_toolbox.utils import mjd
 
 
-class Grib(Dataset):
+class Grib(PredictorDataset):
     """Extract Grib data"""
 
     def __init__(self, directory, file_pattern):
@@ -122,7 +122,7 @@ class Grib(Dataset):
 
     def _extract_time(self, msgid):
         ref_date = dateutil.parser.parse(eccodes.codes_get_string(msgid, "dataDate"))
-        ref_date_mjd = jdcal.gcal2jd(ref_date.year, ref_date.month, ref_date.day)[1]
+        ref_date_mjd = mjd.as_mjd(ref_date.year, ref_date.month, ref_date.day)
         ref_time = eccodes.codes_get(msgid, "dataTime")
 
         forecast_time = 0

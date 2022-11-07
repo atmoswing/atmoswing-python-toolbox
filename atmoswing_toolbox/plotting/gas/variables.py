@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from atmoswing_toolbox.files.parse.optimizer import params
+from atmoswing_toolbox.output_parsers.optimizer import params
 
 
 class PlotsGAsVariables:

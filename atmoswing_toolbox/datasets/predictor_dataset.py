@@ -8,8 +8,8 @@ POINT_WISE = 1
 """ Point wise """
 
 
-class Dataset:
-    """Generic (parent) class not to be used directly. Use Grib or Netcdf datasets."""
+class PredictorDataset:
+    """Base (parent) class not to be used directly. Use Grib or Netcdf datasets."""
 
     def __init__(self, directory, file_pattern):
         self.file_pattern = file_pattern

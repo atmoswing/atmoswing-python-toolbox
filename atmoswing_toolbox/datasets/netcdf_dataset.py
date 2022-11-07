@@ -5,12 +5,12 @@ import dateutil.parser
 import numpy as np
 from netCDF4 import Dataset
 
-from atmoswing_toolbox.external import jdcal
-from atmoswing_toolbox.files.create.predictors import generic
-from atmoswing_toolbox.files.parse.predictors.dataset import Dataset as ds
+from atmoswing_toolbox.datasets import generic
+from atmoswing_toolbox.datasets.predictor_dataset import PredictorDataset
+from atmoswing_toolbox.utils import mjd
 
 
-class NetCDF(ds):
+class NetCDF(PredictorDataset):
     """Extract NetCDF data"""
 
     def __init__(self, directory, file_pattern, var_name):
@@ -119,7 +119,7 @@ class NetCDF(ds):
             str_date = str_date[0:str_space]
 
         ref_date = dateutil.parser.parse(str_date)
-        ref_date_mjd = jdcal.gcal2jd(ref_date.year, ref_date.month, ref_date.day)[1]
+        ref_date_mjd = mjd.as_mjd(ref_date.year, ref_date.month, ref_date.day)
 
         if time_step == "hours":
             time = time / 24

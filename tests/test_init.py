@@ -1,6 +1,6 @@
 import tempfile
 
-from atmoswing_toolbox.files.create.predictors import generic
+from atmoswing_toolbox.datasets import generic
 
 
 def test_module_import():

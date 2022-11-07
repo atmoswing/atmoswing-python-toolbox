@@ -2,8 +2,7 @@
 
 import os
 
-from atmoswing_toolbox.files.create.predictors import generic
-from atmoswing_toolbox.files.parse.predictors import dataset, grib_dataset
+from atmoswing_toolbox.datasets import generic, grib_dataset, predictor_dataset
 
 os.environ.setdefault("ECCODES_DIR", "/usr/local/")
 
@@ -34,7 +33,7 @@ for file in files_list:
     reanalysis = grib_dataset.Grib(directory=dir_origin_files,
                                    file_pattern=pattern)
     reanalysis.load()
-    reanalysis.standardize(mode=dataset.DOMAIN_WISE)
+    reanalysis.standardize(mode=predictor_dataset.DOMAIN_WISE)
     print('Creating new file.')
     new_reanalysis = generic.Generic(directory=dir_target_files,
                                      var_name=var_name_target,
