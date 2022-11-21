@@ -6,7 +6,7 @@ import pandas as pd
 
 def as_mjd(year, month, day, hour=0, minute=0):
     date = datetime.datetime(year, month, day, hour, minute)
-    return pd.DatetimeIndex(date).to_julian_date() - 2400000.5
+    return pd.DatetimeIndex([date]).to_julian_date() - 2400000.5
 
 
 def date_as_mjd(date):
