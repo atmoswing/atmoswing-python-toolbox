@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from atmoswing_toolbox.parsers.optimizer import params
+from ..parsers.optimized_parameters import ParametersArray
 
 
-class PlotsGAsVariables:
+class GAsVariablesPlot:
     """Plotting the results of the Monte Carlo analysis"""
 
     def __init__(self, base_dir, output_path=''):
@@ -90,7 +90,7 @@ class PlotsGAsVariables:
 
     def _parse_results(self):
         data = []
-        resCheck = params.ParamsArray(self.files[0])
+        resCheck = ParametersArray(self.files[0])
         resCheck.load()
         self.struct = resCheck.struct
         labels_slct = []
@@ -109,7 +109,7 @@ class PlotsGAsVariables:
 
         # Extract values
         for filename in self.files:
-            results = params.ParamsArray(filename)
+            results = ParametersArray(filename)
             results.load()
             data_slct = []
             for step, ptors in enumerate(self.struct):

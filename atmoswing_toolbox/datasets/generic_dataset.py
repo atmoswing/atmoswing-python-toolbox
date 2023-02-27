@@ -8,7 +8,7 @@ NETCDF_4 = 1
 """ NetCDF 4 format - smaller but longer to read """
 
 
-class Generic:
+class GenericDataset:
     """Generic dataset"""
 
     def __init__(self, directory, var_name, ref_data):

@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 with open('README.md') as f:
     readme = f.read()
@@ -11,10 +11,18 @@ setup(
     description="Python tools for AtmoSwing",
     long_description=readme,
     long_description_content_type="text/markdown",
-    packages=find_packages(exclude=('tests', 'examples')),
+    packages=['atmoswing-toolbox', 'atmoswing-toolbox.datasets',
+              'atmoswing-toolbox.parsers', 'atmoswing-toolbox.plotting',
+              'atmoswing-toolbox.utils'],
+    package_dir={'atmoswing-toolbox': 'atmoswing_toolbox/datasets',
+                 'atmoswing-toolbox.datasets': 'atmoswing_toolbox/datasets',
+                 'atmoswing-toolbox.parsers': 'atmoswing_toolbox/parsers',
+                 'atmoswing-toolbox.plotting': 'atmoswing_toolbox/plotting',
+                 'atmoswing-toolbox.utils': 'atmoswing_toolbox/utils',
+                 },
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

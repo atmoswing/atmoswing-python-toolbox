@@ -1,4 +1,3 @@
-eccodes
 matplotlib
 netCDF4
 numpy

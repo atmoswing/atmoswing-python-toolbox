@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class ParamsArray:
+class ParametersArray:
     """Parsing of the parameters resulting from the optimizer"""
 
     def __init__(self, path):

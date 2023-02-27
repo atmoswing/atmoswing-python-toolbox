@@ -3,15 +3,15 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from atmoswing_toolbox.parsers.optimizer import params
+from ..parsers.optimized_parameters import ParametersArray
 
 
-class PlotsParamsSensitivity:
+class MonteCarloPlot:
     """Plotting the results of the Monte Carlo analysis"""
 
     def __init__(self, file, output_path=''):
         self.fig = None
-        self.results = params.ParamsArray(file)
+        self.results = ParametersArray(file)
         self.results.load()
         self.other_results = []
         self.other_results_score = []
@@ -34,7 +34,7 @@ class PlotsParamsSensitivity:
         self._loop_structure()
 
     def add_param(self, file, marker='+', period='valid', color=''):
-        other_result = params.ParamsArray(file)
+        other_result = ParametersArray(file)
         other_result.load()
 
         # Make some checks

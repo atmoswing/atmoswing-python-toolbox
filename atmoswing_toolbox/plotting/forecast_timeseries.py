@@ -7,7 +7,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 
-class TimeSeriesForecast:
+class ForecastTimeSeriesPlot:
     """Base class to create a time serie of forecast"""
 
     def __init__(self, output_path=''):

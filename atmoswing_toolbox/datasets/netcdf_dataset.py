@@ -3,19 +3,23 @@ import os
 
 import dateutil.parser
 import numpy as np
-from netCDF4 import Dataset
 
-from atmoswing_toolbox.datasets import generic
-from atmoswing_toolbox.datasets.predictor_dataset import PredictorDataset
-from atmoswing_toolbox.utils import mjd
+import atmoswing_toolbox as astb
+
+from ..utils import mjd
+from .generic_dataset import GenericDataset
+from .predictor_dataset import PredictorDataset
 
 
-class NetCDF(PredictorDataset):
+class NetcdfDataset(PredictorDataset):
     """Extract NetCDF data"""
 
     def __init__(self, directory, file_pattern, var_name):
         super().__init__(directory, file_pattern)
         self.var_name = var_name
+
+        if not astb.has_netcdf:
+            raise ImportError("netCDF4 is required to do this.")
 
     def load(self, spatial_stride=0):
         self._list()
@@ -25,8 +29,8 @@ class NetCDF(PredictorDataset):
         self._list()
         for file in self._files:
             self._extract_file(file, spatial_stride)
-            new_reanalysis = generic.Generic(directory=directory, var_name=var_name,
-                                             ref_data=self)
+            new_reanalysis = GenericDataset(directory=directory, var_name=var_name,
+                                            ref_data=self)
             new_reanalysis.generate(file_name=os.path.basename(file))
             self._drop_data()
 
@@ -51,7 +55,7 @@ class NetCDF(PredictorDataset):
             raise Exception(f'File {file} not found')
 
         print('Reading ' + file)
-        nc = Dataset(file, 'r')
+        nc = astb.Dataset(file, 'r')
         var = nc.variables[self.var_name]
 
         has_levels = len(var.dimensions) == 4
@@ -108,7 +112,8 @@ class NetCDF(PredictorDataset):
         self.axis_lat = []
         self.axis_lon = []
 
-    def _convert_time(self, nc, var, time):
+    @staticmethod
+    def _convert_time(nc, var, time):
         time_units = nc.variables[var.dimensions[0]].units
         str_space = time_units.find(' ')
         time_step = time_units[0:str_space]

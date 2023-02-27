@@ -2,14 +2,15 @@ import glob
 import os
 
 import dateutil.parser
-import eccodes
 import numpy as np
 
-from atmoswing_toolbox.datasets.predictor_dataset import PredictorDataset
-from atmoswing_toolbox.utils import mjd
+import atmoswing_toolbox as astb
+
+from ..utils import mjd
+from .predictor_dataset import PredictorDataset
 
 
-class Grib(PredictorDataset):
+class GribDataset(PredictorDataset):
     """Extract Grib data"""
 
     def __init__(self, directory, file_pattern):
@@ -18,6 +19,9 @@ class Grib(PredictorDataset):
         self.param_code_1 = []
         self.param_code_2 = []
         self.param_code_3 = []
+
+        if not astb.has_eccodes:
+            raise ImportError("eccodes is required to do this.")
 
     def load(self):
         try:
@@ -51,20 +55,22 @@ class Grib(PredictorDataset):
             f = open(file, 'rb')
 
             while True:
-                msgid = eccodes.codes_new_from_file(f, eccodes.CODES_PRODUCT_GRIB)
+                msgid = astb.eccodes.codes_new_from_file(
+                    f, astb.eccodes.CODES_PRODUCT_GRIB)
 
                 if msgid is None:
                     break
 
                 if self.grib_version == 0:
-                    self.grib_version = eccodes.codes_get_long(msgid, "editionNumber")
+                    self.grib_version = astb.eccodes.codes_get_long(
+                        msgid, "editionNumber")
 
                 self._extract_axes(msgid)
                 self._extract_level(msgid)
                 self._extract_time(msgid)
                 self._extract_grib_code(msgid)
 
-                data = eccodes.codes_get_array(msgid, "values")
+                data = astb.eccodes.codes_get_array(msgid, "values")
                 n_lats = len(self.axis_lat)
                 n_lons = len(self.axis_lon)
                 if len(self.data) == 0:
@@ -76,23 +82,27 @@ class Grib(PredictorDataset):
                                           data.reshape((1, 1, n_lats, n_lons)),
                                           axis=0)
 
-                units = eccodes.codes_get(msgid, "units")
+                units = astb.eccodes.codes_get(msgid, "units")
                 if self.data_units is None:
                     self.data_units = units
                 if self.data_units != units:
                     raise Exception("Only 1 type of data per file supported so far.")
 
-                eccodes.codes_release(msgid)
+                astb.eccodes.codes_release(msgid)
 
             f.close()
 
     def _extract_axes(self, msgid):
-        n_lats = eccodes.codes_get_long(msgid, "Nj")
-        n_lons = eccodes.codes_get_long(msgid, "Ni")
-        lat_start = eccodes.codes_get_long(msgid, "latitudeOfFirstGridPointInDegrees")
-        lon_start = eccodes.codes_get_long(msgid, "longitudeOfFirstGridPointInDegrees")
-        lat_end = eccodes.codes_get_long(msgid, "latitudeOfLastGridPointInDegrees")
-        lon_end = eccodes.codes_get_long(msgid, "longitudeOfLastGridPointInDegrees")
+        n_lats = astb.eccodes.codes_get_long(msgid, "Nj")
+        n_lons = astb.eccodes.codes_get_long(msgid, "Ni")
+        lat_start = astb.eccodes.codes_get_long(
+            msgid, "latitudeOfFirstGridPointInDegrees")
+        lon_start = astb.eccodes.codes_get_long(
+            msgid, "longitudeOfFirstGridPointInDegrees")
+        lat_end = astb.eccodes.codes_get_long(
+            msgid, "latitudeOfLastGridPointInDegrees")
+        lon_end = astb.eccodes.codes_get_long(
+            msgid, "longitudeOfLastGridPointInDegrees")
         if lon_end < lon_start:
             lon_start -= 360
 
@@ -109,8 +119,8 @@ class Grib(PredictorDataset):
                 raise Exception("Only 1 extent per file is supported so far.")
 
     def _extract_level(self, msgid):
-        level = eccodes.codes_get_double(msgid, "level")
-        type = eccodes.codes_get(msgid, "typeOfLevel")
+        level = astb.eccodes.codes_get_double(msgid, "level")
+        type = astb.eccodes.codes_get(msgid, "typeOfLevel")
         if type == "isobaricInPa":
             level /= 100
 
@@ -121,17 +131,18 @@ class Grib(PredictorDataset):
                 raise Exception("Only 1 level per file is supported so far.")
 
     def _extract_time(self, msgid):
-        ref_date = dateutil.parser.parse(eccodes.codes_get_string(msgid, "dataDate"))
+        ref_date = dateutil.parser.parse(
+            astb.eccodes.codes_get_string(msgid, "dataDate"))
         ref_date_mjd = mjd.as_mjd(ref_date.year, ref_date.month, ref_date.day)
-        ref_time = eccodes.codes_get(msgid, "dataTime")
+        ref_time = astb.eccodes.codes_get(msgid, "dataTime")
 
         forecast_time = 0
         if self.grib_version == 2:
-            forecast_time = eccodes.codes_get_double(msgid, "forecastTime")
+            forecast_time = astb.eccodes.codes_get_double(msgid, "forecastTime")
         elif self.grib_version == 1:
-            forecast_time = eccodes.codes_get_double(msgid, "endStep")
+            forecast_time = astb.eccodes.codes_get_double(msgid, "endStep")
 
-        time_unit = eccodes.codes_get_long(msgid, "stepUnits")
+        time_unit = astb.eccodes.codes_get_long(msgid, "stepUnits")
         if time_unit == 0:
             forecast_time /= 1440
         elif time_unit == 1:
@@ -146,12 +157,12 @@ class Grib(PredictorDataset):
         category = 0
         number = 0
         if self.grib_version == 2:
-            discipline = eccodes.codes_get_long(msgid, "discipline")
-            category = eccodes.codes_get_long(msgid, "parameterCategory")
-            number = eccodes.codes_get_long(msgid, "parameterNumber")
+            discipline = astb.eccodes.codes_get_long(msgid, "discipline")
+            category = astb.eccodes.codes_get_long(msgid, "parameterCategory")
+            number = astb.eccodes.codes_get_long(msgid, "parameterNumber")
         elif self.grib_version == 1:
-            category = eccodes.codes_get_long(msgid, "table2Version")
-            number = eccodes.codes_get_long(msgid, "indicatorOfParameter")
+            category = astb.eccodes.codes_get_long(msgid, "table2Version")
+            number = astb.eccodes.codes_get_long(msgid, "indicatorOfParameter")
 
         self.param_code_1.append(discipline)
         self.param_code_2.append(category)
