@@ -5,8 +5,8 @@ import dateutil.parser
 import numpy as np
 
 import atmoswing_toolbox as astb
+from atmoswing_toolbox.utils import mjd
 
-from ..utils import mjd
 from .predictor_dataset import PredictorDataset
 
 
