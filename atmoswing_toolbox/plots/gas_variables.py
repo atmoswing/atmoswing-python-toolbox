@@ -16,6 +16,7 @@ class GAsVariablesPlot:
 
     def __init__(self, base_dir, output_path=''):
         self.fig = None
+        self.legend = None
         self.base_dir = base_dir
         self.output_path = output_path
         self.marker_size_max = 50
@@ -28,26 +29,43 @@ class GAsVariablesPlot:
         self.data = []
         self.vars = []
         self.vars_default = [
-            'Z200', 'Z500', 'Z600', 'Z700', 'Z800', 'Z850', 'Z900', 'Z950', 'Z1000',
-            'ZA1000', 'PV/Z', 'U200', 'U300', 'U400', 'U500', 'U600', 'U700', 'U800',
-            'U1000', 'U10m', 'PT/U285', 'PT/U300', 'PT/U315', 'PT/U330', 'PT/U350',
-            'PT/U370', 'PT/U395', 'PV/U', 'V400', 'V500', 'V600', 'V700', 'V800',
-            'V900', 'V950', 'V1000', 'V10m', 'PT/V285', 'PT/V315', 'PT/V330', 'PT/V350',
-            'PT/V370', 'PT/V395', 'PV/V', 'PT/PRES285', 'PV/PRES', 'SLP', 'W200',
-            'W300', 'W400', 'W500', 'W600', 'W700', 'W800', 'W850', 'W900', 'W950',
-            'W1000', 'D300', 'D400', 'D600', 'D800', 'D850', 'D900', 'D950', 'D1000',
-            'D2m', 'PT/D285', 'PT/D315', 'PT/D330', 'PT/D350', 'PT/D370', 'VO300',
-            'VO500', 'VO600', 'VO700', 'VO900', 'PV300', 'PV400', 'PV500', 'PV600',
-            'PV700', 'PV800', 'PV850', 'PV900', 'PV950', 'PV1000', 'PT/PV285',
-            'PT/PV330', 'PT/PV350', 'PT/PV370', 'PT/PV395', 'PT/MONT285', 'PT/MONT300',
-            'PT/MONT330', 'PT/MONT350', 'PT/MONT370', 'RH500', 'RH600', 'RH700',
-            'RH800', 'RH850', 'RH900', 'RH950', 'RH1000', 'MI500', 'MI600', 'MI700',
-            'MI800', 'MI850', 'MI900', 'MI950', 'MI1000', 'SH500', 'SH600', 'SH700',
-            'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395', 'TCW', 'CWAT',
-            'IE', 'T400', 'T500', 'T600', 'T700', 'T800', 'T850', 'T900', 'T950', 'T2m',
-            'PV/PT', 'DEG0L', 'SSR', 'SSRD', 'STR', 'STRD', 'SLHF', 'SSHF', 'TSR',
-            'TTR', 'CAPE', 'TCC', 'CC500', 'CC600', 'CC700', 'CC800', 'CC850', 'CC1000',
-            'LCC', 'SD']
+            'Z200', 'Z300', 'Z400', 'Z500', 'Z600', 'Z700', 'Z800', 'Z850', 'Z900',
+            'Z925', 'Z950', 'Z1000',
+            'ZA1000',
+            'PV/Z',
+            'U200', 'U300', 'U400', 'U500', 'U600', 'U700', 'U800', 'U1000', 'U10m',
+            'PT/U285', 'PT/U300', 'PT/U315', 'PT/U330', 'PT/U350', 'PT/U370', 'PT/U395',
+            'PV/U',
+            'V400', 'V500', 'V600', 'V700', 'V800', 'V900', 'V950', 'V1000', 'V10m',
+            'PT/V285', 'PT/V315', 'PT/V330', 'PT/V350', 'PT/V370', 'PT/V395',
+            'PV/V',
+            'PT/PRES285', 'PV/PRES',
+            'SLP',
+            'W200', 'W300', 'W400', 'W500', 'W600', 'W700', 'W800', 'W850', 'W900',
+            'W950', 'W1000',
+            'D300', 'D400', 'D600', 'D800', 'D850', 'D900', 'D950', 'D1000', 'D2m',
+            'PT/D285', 'PT/D315', 'PT/D330', 'PT/D350', 'PT/D370',
+            'VO300', 'VO500', 'VO600', 'VO700', 'VO900',
+            'PV300', 'PV400', 'PV500', 'PV600', 'PV700', 'PV800', 'PV850', 'PV900',
+            'PV950', 'PV1000',
+            'PT/PV285', 'PT/PV330', 'PT/PV350', 'PT/PV370', 'PT/PV395',
+            'PT/MONT285', 'PT/MONT300', 'PT/MONT330', 'PT/MONT350', 'PT/MONT370',
+            'RH500', 'RH600', 'RH700', 'RH800', 'RH850', 'RH900', 'RH950', 'RH1000',
+            'MI500', 'MI600', 'MI700', 'MI800', 'MI850', 'MI900', 'MI950', 'MI1000',
+            'SH500', 'SH600', 'SH700',
+            'PT/SH315', 'PT/SH330', 'PT/SH350', 'PT/SH370', 'PT/SH395',
+            'TCW', 'CWAT',
+            'IE',
+            'T400', 'T500', 'T600', 'T700', 'T800', 'T850', 'T900', 'T950', 'T2m',
+            'PV/PT',
+            'DEG0L',
+            'SSR', 'SSRD', 'STR', 'STRD',
+            'SLHF', 'SSHF',
+            'TSR', 'TTR',
+            'CAPE',
+            'TCC', 'CC500', 'CC600', 'CC700', 'CC800', 'CC850', 'CC1000',
+            'LCC', 'SD'
+        ]
         self.use_vars_default = True
         self.stations = []
         self.time_step = 6
@@ -57,28 +75,33 @@ class GAsVariablesPlot:
                         'd', 'X']
         self.files = glob.glob(base_dir + '/**/*best_individual.txt', recursive=True)
 
-    def show_scatter(self):
+    def show_scatter(self, show_criteria=True):
         plt.ion()
-        self._set_criteria_color()
+        if show_criteria:
+            self._set_criteria_color()
         self._set_marker_size()
-        self._make_scatter_plot()
+        self._make_scatter_plot(show_criteria)
         plt.show()
 
-    def print_scatter(self, filename):
+    def print_scatter(self, filename, show_criteria=True):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self._set_criteria_color()
+        if show_criteria:
+            self._set_criteria_color()
         self._set_marker_size()
-        self._make_scatter_plot()
+        self._make_scatter_plot(show_criteria)
         self._print(filename)
 
-    def print_syntheses(self, filename):
+    def print_syntheses(self, filename, show_criteria=True, target_lons=None,
+                        target_lats=None, sort_by_selection=True):
         if not self.output_path:
             raise Exception('Output path not provided')
         plt.ioff()
-        self._set_criteria_color()
-        self._make_syntheses_plot()
+        if show_criteria:
+            self._set_criteria_color()
+        self._make_syntheses_plot(show_criteria, target_lons, target_lats,
+                                  sort_by_selection)
         self._print(filename)
 
     def load(self):
@@ -233,7 +256,7 @@ class GAsVariablesPlot:
                 sizes[sizes < 1] = 1
                 self.data.loc[indexes, 'marker_size'] = sizes
 
-    def _make_scatter_plot(self):
+    def _make_scatter_plot(self, show_criteria=True):
         fig_height = 0.66 + float(len(self.vars)) * 3.7/25.0
         self.fig = plt.figure(figsize=(10, fig_height))
         plt.grid(axis='y', alpha=0.2)
@@ -256,8 +279,11 @@ class GAsVariablesPlot:
             for ptor in range(ptors):
                 x = np.arange(1, len(self.data) + 1)
                 variables = self.data[f'var_index_{step}_{ptor}']
-                facecolors = self.data[f'crit_color_{step}_{ptor}']
-                edgecolors = self.data[f'crit_color_{step}_{ptor}']
+                facecolors = None
+                edgecolors = 'black'
+                if show_criteria:
+                    facecolors = self.data[f'crit_color_{step}_{ptor}']
+                    edgecolors = self.data[f'crit_color_{step}_{ptor}']
                 if self.marker_size_on_weight:
                     sizes = self.data[f'marker_size_{step}_{ptor}']
                     facecolors = 'none'
@@ -280,16 +306,20 @@ class GAsVariablesPlot:
         plt.tick_params(axis='both', which='both', bottom=False, top=False,
                         labelbottom=True, left=False, right=False, labelleft=True)
 
-        patches = []
-        for idx, criteria in enumerate(self.crit):
-            patches.append(mpatches.Patch(color=self.colors[idx], label=criteria,
-                                          alpha=self.marker_alpha))
-        plt.legend(handles=patches, title="Criteria", loc="center left",
-                   bbox_to_anchor=(1, 0, 0.5, 1), frameon=False)
+        if show_criteria:
+            patches = []
+            for idx, criteria in enumerate(self.crit):
+                patches.append(mpatches.Patch(color=self.colors[idx], label=criteria,
+                                              alpha=self.marker_alpha))
+            plt.legend(handles=patches, title="Criteria", loc="center left",
+                       bbox_to_anchor=(1, 0, 0.5, 1), frameon=False)
 
         self.fig.tight_layout()
 
-    def _make_syntheses_plot(self):
+    def _make_syntheses_plot(self, show_criteria=True, target_lons=None,
+                             target_lats=None, sort_by_selection=True):
+        cmap = plt.get_cmap('viridis')
+
         fig_height = 2 + 2 * self.variables_importance_nb * 3.7/25.0
         self.fig, axs = plt.subplots(2, 2, figsize=(10, fig_height))
         axs[0, 1].grid(axis='y', alpha=0.2)
@@ -298,6 +328,10 @@ class GAsVariablesPlot:
         axs[0, 1].set_ylim(0, self.variables_importance_nb + 1)
         axs[1, 0].set_ylim(0, self.variables_importance_nb + 1)
         axs[1, 1].set_ylim(0, self.variables_importance_nb + 1)
+
+        self.legend, legend_axs = plt.subplots(1, 2, figsize=(10, 0.5))
+        legend_axs[0].axis('off')
+        legend_axs[1].axis('off')
 
         vars_weights = [[] for i in range(len(self.vars))]
         vars_colors = [[] for i in range(len(self.vars))]
@@ -311,7 +345,9 @@ class GAsVariablesPlot:
             for ptor in range(ptors):
                 variables = self.data[f'var_index_{step}_{ptor}']
                 weights = self.data[f'weight_{step}_{ptor}']
-                crit_color = self.data[f'crit_color_{step}_{ptor}']
+                crit_color = cmap(0.5)
+                if show_criteria:
+                    crit_color = self.data[f'crit_color_{step}_{ptor}']
                 times = self.data[f'time_{step}_{ptor}']
                 xmins = self.data[f'x_min_{step}_{ptor}']
                 xmaxs = self.data[f'x_max_{step}_{ptor}']
@@ -332,7 +368,10 @@ class GAsVariablesPlot:
 
                 for i in range(len(variables)):
                     vars_weights[variables.iloc[i]].append(weights.iloc[i])
-                    vars_colors[variables.iloc[i]].append(crit_color.iloc[i])
+                    var_color = cmap(0.5)
+                    if show_criteria:
+                        var_color = crit_color.iloc[i]
+                    vars_colors[variables.iloc[i]].append(var_color)
                     vars_times[variables.iloc[i]].append(times.iloc[i])
                     vars_xmins[variables.iloc[i]].append(xmins.iloc[i])
                     vars_xmaxs[variables.iloc[i]].append(xmaxs.iloc[i])
@@ -345,12 +384,26 @@ class GAsVariablesPlot:
             sums.append(np.sum(weights))
             counts.append(len(weights))
 
-        counts, sums, vars_weights, vars_colors, vars_times, vars_xmins, vars_xmaxs, \
-            vars_ymins, vars_ymaxs, vars = (
-                list(t) for t in zip(*sorted(
-                    zip(counts, sums, vars_weights, vars_colors, vars_times, vars_xmins,
-                        vars_xmaxs, vars_ymins, vars_ymaxs, self.vars.tolist()),
-                    reverse=True)))
+        if sort_by_selection:
+            counts, sums, vars_weights, vars_colors, vars_times, vars_xmins, \
+                vars_xmaxs, vars_ymins, vars_ymaxs, vars = (
+                    list(t) for t in zip(*sorted(
+                        zip(counts, sums, vars_weights, vars_colors,
+                            vars_times, vars_xmins, vars_xmaxs, vars_ymins,
+                            vars_ymaxs, self.vars.tolist()),
+                        reverse=True)))
+        else:
+            vars = self.vars.tolist()
+            vars.reverse()
+            counts.reverse()
+            sums.reverse()
+            vars_weights.reverse()
+            vars_colors.reverse()
+            vars_times.reverse()
+            vars_xmins.reverse()
+            vars_xmaxs.reverse()
+            vars_ymins.reverse()
+            vars_ymaxs.reverse()
 
         y = range(1, self.variables_importance_nb + 1)
 
@@ -378,17 +431,20 @@ class GAsVariablesPlot:
                 axs[0, 0].barh(i+1, x_width, left=x_start, color=color)
                 x_start += x_width
 
-        patches = []
-        for idx, criteria in enumerate(self.crit):
-            patches.append(mpatches.Patch(color=self.colors[idx], label=criteria))
-        axs[0, 0].legend(handles=patches, title="Criteria", loc="lower right",
-                         frameon=False)
+        if show_criteria:
+            patches = []
+            for idx, criteria in enumerate(self.crit):
+                patches.append(mpatches.Patch(color=self.colors[idx], label=criteria))
+            axs[0, 0].legend(handles=patches, title="Criteria", loc="lower right",
+                             frameon=False)
 
         # Print weights
         #  axs[0, 1].boxplot(vars_weights[0:self.variables_importance_nb], vert=False)
 
         # Print longitude
-        axs[0, 1].axvspan(6, 10.5, facecolor='gray', alpha=0.3)
+        if target_lons:
+            axs[0, 1].axvspan(target_lons[0], target_lons[1],
+                              facecolor='gray', alpha=0.3)
         box1 = axs[0, 1].boxplot(vars_xmins[0:self.variables_importance_nb], vert=False,
                                  flierprops=flierprops1)
         box2 = axs[0, 1].boxplot(vars_xmaxs[0:self.variables_importance_nb], vert=False,
@@ -418,7 +474,6 @@ class GAsVariablesPlot:
             h_min = min(float(np.min(count_time, axis=0)[0]), h_min)
             h_max = max(float(np.max(count_time, axis=0)[0]), h_max)
 
-        cmap = plt.get_cmap('viridis')
         for i in range(self.variables_importance_nb):
             x_start = 0
             for count_time in count_times[i]:
@@ -432,11 +487,13 @@ class GAsVariablesPlot:
         for hr in range(int(h_min), int(h_max) + self.time_step, self.time_step):
             patches.append(mpatches.Patch(color=cmap((hr - h_min) / (h_max - h_min)),
                                           label=f'{hr}'))
-        axs[1, 0].legend(handles=patches, bbox_to_anchor=(1, -0.2),  # title="Time"
-                         ncol=5, loc='lower right', frameon=False)
+        legend_axs[0].legend(handles=patches, bbox_to_anchor=(0.5, 0),
+                             ncol=6, loc='lower center', frameon=False)
 
         # Print latitudes
-        axs[1, 1].axvspan(45.8, 47.8, facecolor='gray', alpha=0.3)
+        if target_lats:
+            axs[1, 1].axvspan(target_lats[0], target_lats[1],
+                              facecolor='gray', alpha=0.3)
         box1 = axs[1, 1].boxplot(vars_ymins[0:self.variables_importance_nb], vert=False,
                                  flierprops=flierprops1)
         box2 = axs[1, 1].boxplot(vars_ymaxs[0:self.variables_importance_nb], vert=False,
@@ -454,12 +511,12 @@ class GAsVariablesPlot:
 
         min_line = mlines.Line2D([], [], color=color1, label='min')
         max_line = mlines.Line2D([], [], color=color2, label='max')
-        switzerland = mpatches.Patch(color='gray', alpha=0.3, label='Switzerland')
+        target = mpatches.Patch(color='gray', alpha=0.3, label='Target')
         patches.append(mpatches.Patch(color1, label='min'))
         patches.append(mpatches.Patch(color2, label='max'))
-        axs[1, 1].legend(handles=[min_line, max_line, switzerland],
-                         bbox_to_anchor=(0.5, -0.2), ncol=3,
-                         loc='lower center', frameon=False)
+        legend_axs[1].legend(handles=[min_line, max_line, target],
+                             bbox_to_anchor=(0.5, 0), ncol=3,
+                             loc='lower center', frameon=False)
 
         y_ticks = vars[0:self.variables_importance_nb]
         axs[0, 0].set_yticks(y)
@@ -485,4 +542,10 @@ class GAsVariablesPlot:
     def _print(self, filename):
         self.fig.savefig(os.path.join(self.output_path, filename + '.pdf'))
         self.fig.savefig(os.path.join(self.output_path, filename + '.png'), dpi=300)
+        if self.legend:
+            self.legend.savefig(os.path.join(
+                self.output_path, filename + '_legend.pdf'))
+            self.legend.savefig(os.path.join(
+                self.output_path, filename + '_legend.png'), dpi=300)
+
         plt.close(self.fig)

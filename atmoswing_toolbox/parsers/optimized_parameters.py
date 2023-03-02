@@ -142,6 +142,10 @@ class ParametersArray:
 
     def get_variable(self, step, ptor, index=0):
         var = str(self.data[f'Variable_{step}_{ptor}'].iloc[index])
+        # Remove prefixes
+        if 'GenericNetcdf 100/' in var:
+            var = var.replace('GenericNetcdf 100/', '')
+
         # Map levels
         if 'pressure/' in var:
             var = var.replace('pressure/', 'pl/')
@@ -162,6 +166,8 @@ class ParametersArray:
 
         # Rename variables
         if 'hgt' in var:
+            return 'Z'
+        if var == 'z':
             return 'Z'
         elif 'pl/z' in var:
             return 'Z'
