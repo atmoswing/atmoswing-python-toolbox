@@ -120,6 +120,7 @@ class GAsVariablesPlot:
 
         # Create labels
         for step, ptors in enumerate(self.struct):
+            labels_slct.append(f'anb_{step}')
             for ptor in range(ptors):
                 labels_slct.append(f'var_{step}_{ptor}')
                 labels_slct.append(f'criterion_{step}_{ptor}')
@@ -136,6 +137,7 @@ class GAsVariablesPlot:
             results.load()
             data_slct = []
             for step, ptors in enumerate(self.struct):
+                data_slct.append(results.get_anbs(step))
                 for ptor in range(ptors):
                     if ptor >= results.struct[step]:
                         continue
