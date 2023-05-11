@@ -14,7 +14,8 @@ from atmoswing_toolbox.parsers.optimized_parameters import ParametersArray
 class GAsVariablesPlot:
     """Plotting the results of the Monte Carlo analysis"""
 
-    def __init__(self, base_dir, output_path=''):
+    def __init__(self, base_dir, output_path='',
+                 files_pattern='**/*best_individual.txt'):
         self.fig = None
         self.legend = None
         self.base_dir = base_dir
@@ -73,7 +74,7 @@ class GAsVariablesPlot:
         self.colors = plt.get_cmap('tab10').colors
         self.markers = ['o', 'v', 's', 'P', '^', '<', '>', '8', 'p', '*', 'h', 'H', 'D',
                         'd', 'X']
-        self.files = glob.glob(base_dir + '/**/*best_individual.txt', recursive=True)
+        self.files = glob.glob(base_dir + '/' + files_pattern, recursive=True)
 
     def show_scatter(self, show_criteria=True):
         plt.ion()
