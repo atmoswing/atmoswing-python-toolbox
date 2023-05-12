@@ -27,6 +27,7 @@ class GribDataset(PredictorDataset):
         try:
             self._list()
             self._extract()
+            self._reorganize()
         except OSError as err:
             print(f"OS error: {err}")
         except Exception as e:
@@ -44,6 +45,32 @@ class GribDataset(PredictorDataset):
                 f'No file found as {os.path.join(self.directory, self.file_pattern)}')
 
         self._files.sort()
+
+    def _reorganize(self):
+        # Extract axes unique values
+        axis_time = np.array(self.axis_time)
+        axis_time = np.unique(axis_time)
+        axis_time = np.sort(axis_time)
+        axis_level = np.array(self.axis_level)
+        axis_level = np.unique(axis_level)
+        axis_level = np.sort(axis_level)
+
+        # Reorganize data
+        data = self.data
+        new_data = np.ones((len(axis_time),
+                            len(axis_level),
+                            len(self.axis_lat),
+                            len(self.axis_lon))) * np.nan
+        for i in range(len(self.axis_time)):
+            time_val = self.axis_time[i][0]
+            i_time = np.where(axis_time == time_val)
+            level_val = self.axis_level[i]
+            i_level = np.where(axis_level == level_val)
+            new_data[i_time, i_level, :, :] = data[i, 0, :, :]
+
+        self.data = new_data
+        self.axis_time = axis_time
+        self.axis_level = axis_level
 
     def _extract(self):
         for file in self._files:
@@ -124,11 +151,7 @@ class GribDataset(PredictorDataset):
         if type == "isobaricInPa":
             level /= 100
 
-        if len(self.axis_level) == 0:
-            self.axis_level.append(level)
-        else:
-            if self.axis_level[0] != level:
-                raise Exception("Only 1 level per file is supported so far.")
+        self.axis_level.append(level)
 
     def _extract_time(self, msgid):
         ref_date = dateutil.parser.parse(
