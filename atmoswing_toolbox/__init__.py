@@ -12,4 +12,4 @@ except ImportError:
 else:
     has_eccodes = True
 
-__all__ = ('Dataset', 'eccodes')
+__all__ = ('Dataset', 'eccodes', 'has_netcdf', 'has_eccodes')
