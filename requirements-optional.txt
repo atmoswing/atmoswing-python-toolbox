@@ -1,4 +1,3 @@
 eccodes
 matplotlib
-pre-commit
-pytest
+pandas
