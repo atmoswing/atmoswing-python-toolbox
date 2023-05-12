@@ -2,7 +2,7 @@
 
 import os
 
-from atmoswing_toolbox.datasets import generic, netcdf_dataset
+from atmoswing_toolbox.datasets import generic_dataset, netcdf_dataset
 
 dir_origin = 'path/to/data'
 dir_target = 'path/to/outputs'
@@ -53,11 +53,13 @@ for file in files_list:
     var_name_origin = file[1]
     var_name_target = file[2]
 
-    reanalysis = netcdf_dataset.NetCDF(directory=dir_origin_files,
-                                       file_pattern='*.nc',
-                                       var_name=var_name_origin)
+    reanalysis = netcdf_dataset.NetcdfDataset(
+        directory=dir_origin_files,
+        file_pattern='*.nc',
+        var_name=var_name_origin)
     reanalysis.load()
-    new_reanalysis = generic.Generic(directory=dir_target_files,
-                                     var_name=var_name_target,
-                                     ref_data=reanalysis)
+    new_reanalysis = generic_dataset.GenericDataset(
+        directory=dir_target_files,
+        var_name=var_name_target,
+        ref_data=reanalysis)
     new_reanalysis.generate()

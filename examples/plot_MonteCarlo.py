@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from atmoswing_toolbox.plots import montecarlo
+from atmoswing_toolbox.plots.montecarlo import MonteCarloPlot
 
 base_dir = '...'
 output_path = base_dir + '_Plots\\'
@@ -14,7 +14,7 @@ file_ga2 = '..._best_individual.txt'
 file_ga3 = '..._best_individual.txt'
 
 
-mc = montecarlo.PlotsParamsSensitivity(base_dir + file, output_path)
+mc = MonteCarloPlot(base_dir + file, output_path)
 mc.add_param(base_dir + file_calib_cp, 's', 'calib')
 mc.add_param(base_dir + file_calib_vp, 's', 'valid')
 mc.add_param(base_dir + file_ga1, 'v', 'calib')

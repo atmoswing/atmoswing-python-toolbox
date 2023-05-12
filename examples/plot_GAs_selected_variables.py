@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 
-from atmoswing_toolbox.plots.gas import variables
+from atmoswing_toolbox.plots.gas_variables import GAsVariablesPlot
 
 era5_results = True
 
@@ -13,7 +13,7 @@ else:
 
 output_path = base_dir + '\\..\\'
 
-res = variables.PlotsGAsVariables(base_dir, output_path)
+res = GAsVariablesPlot(base_dir, output_path)
 res.marker_size_on_weight = True
 res.marker_size_max = 40
 res.marker_alpha = 0.8

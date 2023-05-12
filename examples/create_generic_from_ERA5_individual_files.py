@@ -14,7 +14,7 @@ spatial_stride = 4  # 1°
 dir_origin_files = os.path.join(dir_origin)
 dir_target_files = os.path.join(dir_target)
 
-reanalysis = netcdf_dataset.NetCDF(
+reanalysis = netcdf_dataset.NetcdfDataset(
     directory=dir_origin_files,
     file_pattern=var_name_origin + '.*.nc',
     var_name=var_name_origin)
