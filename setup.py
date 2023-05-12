@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="atmoswing-toolbox",
-    version="1.3.5",
+    version="1.3.6",
     author="Pascal Horton",
     author_email="pascal.horton@giub.unibe",
     description="Python tools for AtmoSwing",
@@ -14,7 +14,7 @@ setup(
     packages=['atmoswing_toolbox', 'atmoswing_toolbox.datasets',
               'atmoswing_toolbox.parsers', 'atmoswing_toolbox.plots',
               'atmoswing_toolbox.utils'],
-    package_dir={'atmoswing_toolbox': 'atmoswing_toolbox/datasets',
+    package_dir={'atmoswing_toolbox': 'atmoswing_toolbox',
                  'atmoswing_toolbox.datasets': 'atmoswing_toolbox/datasets',
                  'atmoswing_toolbox.parsers': 'atmoswing_toolbox/parsers',
                  'atmoswing_toolbox.plots': 'atmoswing_toolbox/plots',
