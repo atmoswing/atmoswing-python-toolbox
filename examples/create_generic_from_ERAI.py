@@ -7,7 +7,8 @@ from atmoswing_toolbox.datasets import generic_dataset, netcdf_dataset
 dir_origin = 'path/to/data'
 dir_target = 'path/to/outputs'
 
-files_list = [['pressure', 'd', 'd'],
+files_list = [['pressure', 'z', 'z'],
+              ['pressure', 'd', 'd'],
               ['pressure', 'pv', 'pv'],
               ['pressure', 'q', 'q'],
               ['pressure', 'r', 'r'],
@@ -16,7 +17,6 @@ files_list = [['pressure', 'd', 'd'],
               ['pressure', 'v', 'v'],
               ['pressure', 'vo', 'vo'],
               ['pressure', 'w', 'w'],
-              ['pressure', 'z', 'z'],
               ['potential_temperature', 'd', 'd'],
               ['potential_temperature', 'mont', 'mont'],
               ['potential_temperature', 'pres', 'pres'],
